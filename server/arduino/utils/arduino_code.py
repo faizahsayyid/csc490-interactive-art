@@ -12,12 +12,8 @@ int lastButtonState = LOW;
 bool ledState = false;
 
 void setup() {
-  // Initialize the button pin as an input
   pinMode(buttonPin, INPUT);
-  // Initialize the LED pin as an output
   pinMode(ledPin, OUTPUT);
-  // Start Serial communication
-  Serial.begin(9600);
 }
 
 void loop() {
@@ -30,9 +26,6 @@ void loop() {
       // Toggle the LED state
       ledState = !ledState;
       digitalWrite(ledPin, ledState ? HIGH : LOW);
-
-      // Log the state change to the console
-      Serial.println(ledState ? "LED turned on" : "LED turned off");
     }
     // Update the last button state
     lastButtonState = buttonState;
