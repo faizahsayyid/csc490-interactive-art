@@ -4,6 +4,7 @@ import os
 import serial
 import serial.tools.list_ports
 
+
 class inoCodeDataStructure:
     def __init__(self):
         self.setup: List[Union[Dict[list], str]] = []
@@ -13,13 +14,13 @@ class inoCodeDataStructure:
         self.loop_code = ""
         self.port = self.__find_port()
         self.board_type = "arduino:avr:nano"
-        self.file_name = "my_sketch.ino"        
+        self.file_name = "my_sketch.ino"
 
     def __str__(self):
         self.setup_code = ""
-        setup_code = self.format_code_block(self.setup, "setup")
+        setup_code = self.__format_code_block(self.setup, "setup")
         self.loop_code = ""
-        loop_code = self.format_code_block(self.loop, "loop")
+        loop_code = self.__format_code_block(self.loop, "loop")
         globals = "\n".join(self.globals)
 
         return f"""
@@ -35,6 +36,7 @@ void loop() {{
 {loop_code}
 }}
 """
+
     def __find_port(self):
         ports = serial.tools.list_ports.comports()
         for port in ports:
@@ -43,14 +45,14 @@ void loop() {{
                 return port.device
         print("No port found")
         return None
-    
+
     def __write_code_to_file(self, code: str, file_name: str):
-        os.makedirs(file_name.rsplit('.', 1)[0], exist_ok=True)
-        with open(os.path.join(file_name.rsplit('.', 1)[0], file_name), "w") as file:
+        os.makedirs(file_name.rsplit(".", 1)[0], exist_ok=True)
+        with open(os.path.join(file_name.rsplit(".", 1)[0], file_name), "w") as file:
             file.write(code)
-            
+
     def __upload_sketch(self, file_name: str, board_type: str, port: str):
-        dir_name = file_name.rsplit('.', 1)[0]
+        dir_name = file_name.rsplit(".", 1)[0]
         upload_command = [
             "arduino-cli",
             "compile",
@@ -67,13 +69,13 @@ void loop() {{
             print("Upload successful")
         except subprocess.CalledProcessError:
             print("Error during upload")
-    
+
     def __clean_up(self, file_name: str):
-        dir_name = file_name.rsplit('.', 1)[0]
+        dir_name = file_name.rsplit(".", 1)[0]
         os.remove(os.path.join(dir_name, file_name))
         os.rmdir(dir_name)
 
-    def format_code_block(
+    def __format_code_block(
         self, code_blocks: List[Union[Dict[str, List[str]], str]], type: str
     ) -> str:
         if type == "setup":
@@ -86,20 +88,25 @@ void loop() {{
                 formatted_code += f"{block}\n"
             elif isinstance(block, dict):
                 items = list(block.items())
-                assert len(items) == 1 and len(items[0]) == 2 and isinstance(items[0][1], list) and isinstance(items[0][0], str)
+                assert (
+                    len(items) == 1
+                    and len(items[0]) == 2
+                    and isinstance(items[0][1], list)
+                    and isinstance(items[0][0], str)
+                )
                 statement, inside_code = items[0]
                 formatted_code += f"{statement} {{\n"
-                formatted_code += self.format_code_block(inside_code, type)
+                formatted_code += self.__format_code_block(inside_code, type)
                 formatted_code += "}\n"
-                
+
         return formatted_code
-    
+
     def upload(self):
         print(f"Uploading code: {self}")
         self.__write_code_to_file(str(self), self.file_name)
         self.__upload_sketch(self.file_name, self.board_type, self.port)
         self.__clean_up(self.file_name)
-    
+
 
 # Example usage
 code = inoCodeDataStructure()
@@ -128,5 +135,4 @@ code.loop.append(
     }
 )
 code.loop.append("delay(100);")
-print(code)
 code.upload()
