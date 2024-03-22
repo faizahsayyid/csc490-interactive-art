@@ -18,21 +18,19 @@ class inoCodeDataStructure:
 
     def __str__(self):
         self.setup_code = ""
-        setup_code = self.__format_code_block(self.setup, "setup")
+        setup_code = self.__format_code_block(self.setup, type="setup", depth=1)
         self.loop_code = ""
-        loop_code = self.__format_code_block(self.loop, "loop")
+        loop_code = self.__format_code_block(self.loop, type="loop", depth=1)
         globals = "\n".join(self.globals)
 
         return f"""
 {globals}
 
 void setup() {{
-// put your setup code here, to run once:
 {setup_code}
 }}
 
 void loop() {{
-// put your main code here, to run repeatedly:
 {loop_code}
 }}
 """
@@ -76,8 +74,13 @@ void loop() {{
         os.rmdir(dir_name)
 
     def __format_code_block(
-        self, code_blocks: List[Union[Dict[str, List[str]], str]], type: str
+        self,
+        code_blocks: List[Union[Dict[str, List[str]], str]],
+        type: str,
+        depth: int,
+        indent=2,
     ) -> str:
+        tab = " " * indent * depth
         if type == "setup":
             formatted_code = self.setup_code
         elif type == "loop":
@@ -85,7 +88,7 @@ void loop() {{
 
         for block in code_blocks:
             if isinstance(block, str):
-                formatted_code += f"{block}\n"
+                formatted_code += f"{tab}{block}\n"
             elif isinstance(block, dict):
                 items = list(block.items())
                 assert (
@@ -95,9 +98,11 @@ void loop() {{
                     and isinstance(items[0][0], str)
                 )
                 statement, inside_code = items[0]
-                formatted_code += f"{statement} {{\n"
-                formatted_code += self.__format_code_block(inside_code, type)
-                formatted_code += "}\n"
+                formatted_code += f"{tab}{statement} {{\n"
+                formatted_code += self.__format_code_block(
+                    inside_code, type=type, depth=depth + 1
+                )
+                formatted_code += f"{tab}}}\n"
 
         return formatted_code
 
@@ -135,4 +140,5 @@ code.loop.append(
     }
 )
 code.loop.append("delay(100);")
-code.upload()
+# code.upload()
+print(code)
