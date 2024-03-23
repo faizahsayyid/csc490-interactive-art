@@ -1,0 +1,1 @@
+digitalWrite(OUTPUT_PIN, !digitalRead(OUTPUT_PIN));

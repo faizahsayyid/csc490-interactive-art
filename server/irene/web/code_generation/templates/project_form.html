@@ -1,0 +1,78 @@
+<!-- project_form.html (Template) -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Project</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $("#id_input_device").change(function(){
+                var inputDevice = $(this).val();
+                $.ajax({
+                    url: '/get-input-actions/',  // Endpoint to fetch input actions
+                    method: 'GET',
+                    data: {
+                        'input_device': inputDevice
+                    },
+                    success: function(data){
+                        $("#id_input_action").empty();
+                        $.each(data.input_actions, function(key, value){
+                            $("#id_input_action").append($('<option></option>').attr('value', key).text(value));
+                        });
+                    }
+                });
+            });
+
+            $("#id_output_device").change(function(){
+                var outputDevice = $(this).val();
+                $.ajax({
+                    url: '/get-output-actions/',  // Endpoint to fetch output actions
+                    method: 'GET',
+                    data: {
+                        'output_device': outputDevice
+                    },
+                    success: function(data){
+                        $("#id_output_action").empty();
+                        $.each(data.output_actions, function(key, value){
+                            $("#id_output_action").append($('<option></option>').attr('value', key).text(value));
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <form method="POST">
+        {% csrf_token %}
+        <!-- Dropdowns for selecting input/output devices and actions -->
+        <label for="id_input_device">Input Device:</label>
+        <select name="input_device" id="id_input_device">
+            <option value="">---------</option>
+            {% for choice in input_device_choices %}
+                <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+            {% endfor %}
+        </select><br>
+
+        <label for="id_input_action">Input Action:</label>
+        <select name="input_action" id="id_input_action">
+            <option value="">---------</option>
+        </select><br>
+
+        <label for="id_output_device">Output Device:</label>
+        <select name="output_device" id="id_output_device">
+            <option value="">---------</option>
+            {% for choice in output_device_choices %}
+                <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+            {% endfor %}
+        </select><br>
+
+        <label for="id_output_action">Output Action:</label>
+        <select name="output_action" id="id_output_action">
+            <option value="">---------</option>
+        </select><br>
+
+        <button type="submit">Create Project</button>
+    </form>
+</body>
+</html>
