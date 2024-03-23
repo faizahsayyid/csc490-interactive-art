@@ -1,20 +1,57 @@
-from typing import List, Dict, Union, Any
+from typing import List, Dict, Union, Any, Optional
 import subprocess
 import os
 import serial
 import serial.tools.list_ports
+from actions import Actions
+
+
+class OutputDevice:
+    def __init__(self, pin: int, input_device=None):
+        assert 2 <= pin <= 13
+        self.pin = pin
+        self.input_device = input_device  # Type InputDevice
+
+    def __hash__(self):
+        return hash(self.pin)
+
+    def __eq__(self, other):
+        return self.pin == other.pin
+
+
+class InputDevice:
+    def __init__(self, pin: int, output_devices: Optional[list[OutputDevice]] = None):
+        assert 2 <= pin <= 13
+        self.pin = pin
+        self.output_devices = output_devices
+
+    def __hash__(self):
+        return hash(self.pin)
+
+    def __eq__(self, other):
+        return self.pin == other.pin
 
 
 class inoCodeDataStructure:
     def __init__(self):
+        ### Code data structure ###
         self.setup: List[Union[Dict[list], str]] = []
         self.loop: List[Union[Dict[list], str]] = []
-        self.globals = []
         self.setup_code = ""
         self.loop_code = ""
+        self.globals = []
+
+        ### Arduino upload parameters ###
         self.port = self.__find_port()
         self.board_type = "arduino:avr:nano"
         self.file_name = "my_sketch.ino"
+
+        ### Internal devices ###
+        self.input_devices = set()
+        self.output_devices = set()
+
+        ### Actions ###
+        self.actions = Actions()
 
     def __str__(self):
         """
@@ -142,14 +179,62 @@ void loop() {{
 
     def upload(self):
         """
-        Generates the .ino file, uploads it to the arduino, 
+        Generates the .ino file, uploads it to the arduino,
         and cleans up the temporary files.
-        
-        Call after setting up the code data structure. 
+
+        Call after setting up the code data structure.
         """
         print(f"Uploading code: {self}")
         self.__write_code_to_file(str(self), self.file_name)
         self.__upload_sketch(self.file_name, self.board_type, self.port)
         self.__clean_up(self.file_name)
 
+    def __initialize_pin(self, pin_num: int, device_type: str):
+        """
+        Initialize the pins for the device
+        """
+        assert device_type in ["INPUT", "OUTPUT"]
+        self.setup.append(f"pinMode({pin_num}, {device_type});")
 
+    def initialize_new_device_connection(
+        self,
+        output_pins: List[int],
+        input_pin: Optional[int],
+        action: str,
+        *args,
+        **kwargs,
+    ):
+        """
+        Initialize code to create a new device, with the designated action
+        """
+        if not input_pin:
+            # Solo output device
+            assert len(output_pins) == 1
+            pin = output_pins[0]
+            device = OutputDevice(pin, None)
+            self.__initialize_pin(pin, "OUTPUT")
+            self.output_devices.add(device)
+
+        else:
+            # Input-output device connection
+            # TODO: Change in future for multi-device connections
+            assert len(output_pins) == 1
+            output_pin = output_pins[0]
+            input_device = InputDevice(input_pin)
+            output_device = OutputDevice(output_pin)
+            input_device.output_devices = [output_device]
+            output_device.input_device = input_device
+            self.__initialize_pin(input_pin, "INPUT")
+            self.__initialize_pin(output_pin, "OUTPUT")
+
+            # TODO: Temporary code to test for single input, output for negate_output_on_input
+            global_code, setup_code, loop_code = self.actions.get_action_code(
+                action, input_pin, output_pin, *args, **kwargs
+            )
+            self.globals.extend(global_code)
+            self.setup.extend(setup_code)
+            self.loop.extend(loop_code)
+
+code = inoCodeDataStructure()
+code.initialize_new_device_connection([11], 13, "negate_output_on_input", 50)
+print(code)
