@@ -214,7 +214,8 @@ void loop() {{
             device = OutputDevice(pin, None)
             self.__initialize_pin(pin, "OUTPUT")
             self.output_devices.add(device)
-
+            
+            # TODO, complete
         else:
             # Input-output device connection
             # TODO: Change in future for multi-device connections
