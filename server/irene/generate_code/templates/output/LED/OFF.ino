@@ -1,1 +1,0 @@
-digitalWrite(OUTPUT_PIN, LOW);
