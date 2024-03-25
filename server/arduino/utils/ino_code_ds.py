@@ -3,7 +3,7 @@ import subprocess
 import os
 import serial
 import serial.tools.list_ports
-from actions import Actions
+from .actions import Actions
 
 
 class OutputDevice:
@@ -87,7 +87,7 @@ void loop() {{
                 print(f"Using port: {port.device}")
                 return port.device
         print("No port found")
-        return None
+        return '/dev/cu.usbserial-10'
 
     def __write_code_to_file(self, code: str, file_name: str):
         """
@@ -237,5 +237,6 @@ void loop() {{
             self.loop.extend(loop_code)
 
 code = inoCodeDataStructure()
-code.initialize_new_device_connection([11], 13, "negate_output_on_input", 50)
+code.initialize_new_device_connection([13], 11, "demo", 1000)
 print(code)
+code.upload()

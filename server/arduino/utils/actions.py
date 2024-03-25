@@ -4,8 +4,20 @@ class Actions:
         All functions return a tuple: (global_code, setup_code, loop_code)
         """
         self.actions = {
-            "negate_output_on_input": self.__negate_output_on_input_activation
+            "negate_output_on_input": self.__negate_output_on_input_activation,
+            "demo": self.__demo,
         }
+
+    def __demo(self, input_pin, output_pin, delay) -> tuple[list, list, list]:
+        input_pin = str(input_pin)
+        output_pin = str(output_pin)
+        delay = str(delay)
+        return ([], [], [
+            f"digitalWrite({output_pin}, HIGH);",
+            f"delay({delay});",
+            f"digitalWrite({output_pin}, LOW);",
+            f"delay({delay});",
+        ])
 
     def __negate_output_on_input_activation(self, input_pin, output_pin, delay) -> tuple[list, list, list]:
         input_pin = str(input_pin)
@@ -19,7 +31,7 @@ class Actions:
                     f"digitalWrite({output_pin}, !outputState);",
                 ]
             },
-            f"delay({delay})",
+            f"delay({delay});",
         ])
 
     def get_action_code(self, action_key, *args, **kwargs):
