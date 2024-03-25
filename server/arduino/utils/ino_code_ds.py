@@ -191,25 +191,35 @@ void loop() {{
 
     def __initialize_pin(self, pin_num: int, device_type: str):
         """
-        Initialize the pins for the device
+        Initialize a pin as either an input or output device, and adds the code to the setup block
         """
         assert device_type in ["INPUT", "OUTPUT"]
         self.setup.append(f"pinMode({pin_num}, {device_type});")
 
     def initialize_new_device_connection(
         self,
-        output_pins: List[int],
         input_pin: Optional[int],
+        output_pins: List[int],
         action: str,
         *args,
         **kwargs,
     ):
         """
-        Initialize code to create a new device, with the designated action
+        EITHER:
+            > Connect an input pin to 1 or more output pins, and set the action to be performed
+        OR:
+            > Create an output device connected to no input devices, and set the action to be performed
+            
+        :param input_pin: Pin number of the input device, or None if there is no input device
+        :param output_pins: List of pin numbers of the output devices, if there is no input device, there should only be 1 pin
+        :param action: Action to be performed when the input device is activated, string that corresponds to an action in actions.py
+        :param args: Arguments for the action, additional arguments for the action function as determined in the function header in actions.py
         """
         if not input_pin:
-            # Solo output device
+            # Solo output device, no input device
             assert len(output_pins) == 1
+            
+            # Create output device
             pin = output_pins[0]
             device = OutputDevice(pin, None)
             self.__initialize_pin(pin, "OUTPUT")
@@ -220,6 +230,8 @@ void loop() {{
             # Input-output device connection
             # TODO: Change in future for multi-device connections
             assert len(output_pins) == 1
+            
+            # Create input, output devices
             output_pin = output_pins[0]
             input_device = InputDevice(input_pin)
             output_device = OutputDevice(output_pin)
@@ -229,6 +241,7 @@ void loop() {{
             self.__initialize_pin(output_pin, "OUTPUT")
 
             # TODO: Temporary code to test for single input, output for negate_output_on_input
+            # Generate code based on action, and add to the code data structure
             global_code, setup_code, loop_code = self.actions.get_action_code(
                 action, input_pin, output_pin, *args, **kwargs
             )
@@ -237,5 +250,8 @@ void loop() {{
             self.loop.extend(loop_code)
 
 code = inoCodeDataStructure()
-code.initialize_new_device_connection([11], 13, "negate_output_on_input", 50)
+# Any argument passed that is beyond the action string is passed as *args to the action function, 
+# and is determined by the function header in actions.py
+code.initialize_new_device_connection(11, [13], "negate_output_on_input", 50)
 print(code)
+code.upload()
