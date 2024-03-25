@@ -81,6 +81,7 @@ void loop() {{
 
         :return: Port of the CH340 device
         """
+        # TODO: make sure this works
         ports = serial.tools.list_ports.comports()
         path = "server/arduino/utils/dummy.ino"
         for port in ports:
