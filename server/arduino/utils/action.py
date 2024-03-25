@@ -1,31 +1,5 @@
 from ino_code_ds import inoCodeDataStructure
-
-
-# Ignore this class for now
-# Action.after_action
-# class AfterAction(str):
-#     """
-#     Enum for the action that is triggered after the main action is done
-
-#     NONE: No action after the main action; i.e., the output pin will stay in the same state
-#     HIGH: The output pin will be set to HIGH after the main action is done
-#     LOW: The output pin will be set to LOW after the main action is done
-#     RESTORE_BACK: The output pin will be restored back to the previous state after the main action is done
-#     """
-#     NONE = "NONE"
-#     HIGH = "HIGH"
-#     LOW = "LOW"
-#     RESTORE_BACK = "RESTORE_BACK"
-
-#     def __str__(self):
-#         if self == AfterAction.NONE:
-#             return "NONE"
-#         elif self == AfterAction.HIGH:
-#             return "HIGH"
-#         elif self == AfterAction.LOW:
-#             return "LOW"
-#         elif self == AfterAction.RESTORE_BACK:
-#             return "RESTORE_BACK"
+from typing import Optional
 
 class Action(object):
     """
@@ -33,11 +7,16 @@ class Action(object):
 
     Attributes:
         action (str): The action that is triggered
-        args (dict): The arguments that are passed to the action
+        duration (int): The duration for the action
+    
+    Note:
+        # pin (int): The pin that the device of the action is connected to
+        # Note pin attributes is not implemented in Action but in subclasses
+        # This is to set different default values for the pin for the input and output actions
+        # (e.g., 2 for input and 9 for output)
 
     """
     action: str
-    args: dict
 
     def __init__(self, action):
         """
@@ -48,16 +27,7 @@ class Action(object):
             action (str): The main input/output action that is triggered
         """
         self.action = action
-        self.args = {}
-    
-    def set_pin(self, pin):
-        """
-        (INPUT, OUTPUT)
-        Sets the pin for the action
-
-        If the pin is not specified, the default pin is used, which is 2 for input and 9 for output
-        """
-        self.args['pin'] = pin
+        self.duration = 1000
     
     def set_duration(self, duration):
         """
@@ -74,14 +44,14 @@ class Action(object):
         - the duration is the time that the output should be in the action state
 
         - If the duration is not specified, the default duration is used, which is 1000ms"""
-        self.args['duration'] = duration
+        self.duration = duration
     
     def __str__(self):
         """ 
         (INPUT, OUTPUT)
         Returns a string representation of the action
         """
-        return self.action + "(" + str(self.args) + ")"
+        return self.action + f"\n(pin:" + str(self.pin) + ", duration:" + str(self.duration) + ")"
 
 
 # InputAction class that inherits from Action
@@ -93,10 +63,41 @@ class InputAction(Action):
     - setting the input_reading_delay for all the input action
     - setting the debounce delay for the double-triggered action
 
+    Attributes:
+        pin (int): The pin that the device of the action is connected to (default: 2)
+        input_reading_delay (int): The delay for reading the input pin
+        debounce_delay (int): The debounce delay for the double click action
+
     Note:
       generate_code() method is not implemented for the InputAction class, as
       the input codes are more complex and thus are handled by the Program class
     """
+    pin: int
+    input_reading_delay: int
+    debounce_delay: Optional[int]
+
+    def __init__(self, action):
+        """
+        Initializes the action with the action
+
+        Args:
+            action (str): The main input action that would trigger the output action in the program
+
+        Note:
+            - The args is an empty dictionary by default
+        """
+        super().__init__(action)
+        self.pin = 2
+        self.input_reading_delay = 50
+        self.debounce_delay = None if action != "DOUBLE_TRIGGERED" else 50
+
+    def set_pin(self, pin):
+        """
+        (INPUT)
+        Sets the pin for the input action
+        """
+        self.pin = pin
+
     def set_input_reading_delay(self, input_reading_delay):
         """
         (INPUT)
@@ -104,14 +105,14 @@ class InputAction(Action):
 
         If the delay is not specified, the default delay is used, which is 100ms
         """
-        self.args['input_reading_delay'] = input_reading_delay
+        self.input_reading_delay = input_reading_delay
 
     def set_debounce_delay(self, debounce_delay):
         """
         (INPUT - DOUBLE_TRIGGERED)
         Sets the debounce delay for the double click action
         """
-        self.args['debounce_delay'] = debounce_delay
+        self.debounce_delay = debounce_delay
 
 
 # OutputAction class that inherits from Action
@@ -120,19 +121,26 @@ class OutputAction(Action):
     This is the class that represents an output action
     
     Along with pin and duration, this class also allows:
-    - setting the next_on_delay for the blink action
-    - setting the on_for for the blink action
+    - setting the off_duration for the blink action
+    - setting the on_duration for the blink action
 
     Attributes:
+        pin (int): The pin that the device of the action is connected to (default: 9)
         after_action (str): The action that is triggered after the main action is done
                             Possible values: "NONE", "HIGH", "LOW", "RESTORE_BACK"
+        off_duration (str): The duration for the off state in one blink (string representation of the duration)
+        on_duration (str): The duration for the on state in one blink (string representation of the duration)
     
     Note:
-      generate_code() method is implemented for the OutputAction class, as
-      the output codes are simple and can be handled by the OutputAction class
+      - generate_code() method is implemented for the OutputAction class, as
+        the output codes are simple and can be handled by the OutputAction class
     
     """
+    pin: int
     after_action: str
+    off_duration: Optional[str]
+    on_duration: Optional[str]
+
 
     def __init__(self, action, after_action="NONE"):
         """
@@ -141,27 +149,46 @@ class OutputAction(Action):
         Args:
             action (str): The main action that is performed as the output action
             after_action (str): The action that is triggered after the main action is done
+            - BLINK specific attributes:
+                on_duration (str): The duration for the on state in one blink
+                off_duration (str): The duration for the off state in one blink
+                (default: None for both for non-BLINK actions, and 
+                         "OUTPUT_DURATION / 2" for both for BLINK actions)
 
         Note:
             - The after_action is set to "NONE" by default if not specified
             - The args is an empty dictionary by default
         """
-        super().__init__(action, after_action)
+        super().__init__(action, after_action="NONE")
+        self.pin = 9
         self.after_action = after_action
-
-    def set_next_on_delay(self, next_on_delay):
-        """
-        (OUTPUT - BLINK)
-        Sets the delay between the next on state in the blink action
-        """
-        self.args['next_on_delay'] = next_on_delay
+        self.on_duration = None if action != "BLINK" else "OUTPUT_DURATION / 2"
+        self.off_duration = None if action != "BLINK" else "OUTPUT_DURATION / 2"
     
-    def set_on_for(self, on_for):
+    def set_pin(self, pin):
+        """
+        (OUTPUT)
+        Sets the pin for the output action
+        """
+        self.pin = pin
+
+    def set_off_duration(self, off_duration: int):
         """
         (OUTPUT - BLINK)
-        Sets the duration for the on state in the blink action
+        Sets the duration for the off state in one blink
         """
-        self.args['on_for'] = on_for
+        if self.action != "BLINK":
+            return
+        self.off_duration = str(off_duration)
+    
+    def set_on_duration(self, on_duration: int):
+        """
+        (OUTPUT - BLINK)
+        Sets the duration for the on state in one blink
+        """
+        if self.action != "BLINK":
+            return
+        self.on_duration = str(on_duration)
 
     def generate_code(self):
         """
@@ -193,15 +220,13 @@ class OutputAction(Action):
         if self.after_action != "NONE":
             if self.action == "BLINK":
                 # If the action is BLINK, then the action should be repeated during the duration
-                on_for = "OUTPUT_DURATION / 2" if self.args.get('on_for') is None else self.args['on_for']
-                next_on_delay = "OUTPUT_DURATION / 2" if self.args.get('next_on_delay') is None else self.args['next_on_delay']
                 result.append("blinkStartTime = millis();")
                 result.append("blinkEndTime = blinkStartTime + OUTPUT_DURATION;")
                 result.append({"while (millis() < blinkEndTime) {": [
                                 "digitalWrite(OUTPUT_PIN, HIGH);",
-                                f"delay({on_for});",
+                                f"delay({self.on_duration});",
                                 "digitalWrite(OUTPUT_PIN, LOW);",
-                                f"delay({next_on_delay});"   
+                                f"delay({self.off_duration});"   
                 ]})
             else:
                 # In other cases, the status should remain for the duration
@@ -226,26 +251,23 @@ class Program(object):
     Attributes:
         input_action (Action): The input action that triggers the output action
         output_action (Action): The output action that is triggered
-        args (dict): The arguments that are passed to the program, based on the input and output actions
         code (inoCodeDataStructure): The code that is generated for the program
     """
     input_action: InputAction
     output_action: OutputAction
-    args: dict
     code: inoCodeDataStructure
 
     def __init__(self, input_action, output_action):
+        """
+        Initializes the program with the input and output actions.
+
+        Note:
+        - code is not generated until the generate_code() method is called.
+
+        """
         self.input_action = input_action
         self.output_action = output_action
         self.code = None
-        self.args = {
-            # If the pin is not specified, default to 2 for input and 9 for output
-            'input_pin': '2' if input_action.args.get('pin') is None else input_action.args['pin'],
-            'output_pin': '9' if output_action.args.get('pin') is None else output_action.args['pin'],
-            'input_reading_delay': '100' if input_action.args.get('input_reading_delay') is None else input_action.args['input_reading_delay'],
-            'input_duration': '1000' if input_action.args.get('duration') is None else input_action.args['duration'],
-            'output_duration': '1000' if output_action.args.get('duration') is None else output_action.args['duration']
-        }
 
     def _generate_code(self):
         """
@@ -256,11 +278,11 @@ class Program(object):
             self.code = inoCodeDataStructure()
 
             # Add the necessary global macros + variables
-            self.code.globals.append("#define INPUT_PIN " + self.args['input_pin'])
-            self.code.globals.append("#define OUTPUT_PIN " + self.args['output_pin'])
-            self.code.globals.append("#define INPUT_READING_DELAY " + self.args['input_reading_delay'])
-            self.code.globals.append("#define INPUT_DURATION " + self.args['input_duration'])
-            self.code.globals.append("#define OUTPUT_DURATION " + self.args['output_duration'])
+            self.code.globals.append("#define INPUT_PIN " + str(self.input_action.pin))
+            self.code.globals.append("#define OUTPUT_PIN " + str(self.output_action.pin))
+            self.code.globals.append("#define INPUT_READING_DELAY " + str(self.input_action.input_reading_delay))
+            self.code.globals.append("#define INPUT_DURATION " + str(self.input_duration))
+            self.code.globals.append("#define OUTPUT_DURATION " + str(self.output_duration))
 
             self.code.globals.append("int inputState = 0;")
             self.code.globals.append("int prevInputState = 0;")
@@ -270,10 +292,7 @@ class Program(object):
 
             if self.input_action.action == "DOUBLE_TRIGGERED":
                 self.code.globals.append("unsigned long lastFirstClickTime = 0;")
-                if self.input_action.args.get('debounce_delay') is None:
-                    self.code.globals.append("unsigned long debounceDelay = 50;")
-                else:
-                    self.code.globals.append(f"unsigned long debounceDelay = {self.input_action.args['debounce_delay']};")
+                self.code.globals.append(f"unsigned long debounceDelay = {str(self.input_action.debounce_delay)};")
 
             self.code.setup.append("pinMode(INPUT_PIN, INPUT);")
             self.code.setup.append("pinMode(OUTPUT_PIN, OUTPUT);")
@@ -357,7 +376,7 @@ class Program(object):
             self.code.loop.append("prevInputState = inputState;")
             self.code.loop.append("delay(INPUT_READING_DELAY);")
            
-        pass
+        return None
 
     def upload(self):
         """
