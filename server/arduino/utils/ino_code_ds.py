@@ -82,11 +82,12 @@ void loop() {{
         :return: Port of the CH340 device
         """
         ports = serial.tools.list_ports.comports()
+        path = "server/arduino/utils/dummy.ino"
         for port in ports:
-            if "CH340" in port.description:
-                print(f"Using port: {port.device}")
+            if self.__upload_sketch(path, self.board_type, port.device):
+                print(f"Found port: {port.device}")
                 return port.device
-        print("No port found")
+        print("No CH340 device found")
         return None
 
     def __write_code_to_file(self, code: str, file_name: str):
@@ -123,8 +124,10 @@ void loop() {{
         try:
             subprocess.run(upload_command, check=True)
             print("Upload successful")
+            return True
         except subprocess.CalledProcessError:
             print("Error during upload")
+            return False
 
     def __clean_up(self, file_name: str):
         """
@@ -209,7 +212,7 @@ void loop() {{
             > Connect an input pin to 1 or more output pins, and set the action to be performed
         OR:
             > Create an output device connected to no input devices, and set the action to be performed
-            
+
         :param input_pin: Pin number of the input device, or None if there is no input device
         :param output_pins: List of pin numbers of the output devices, if there is no input device, there should only be 1 pin
         :param action: Action to be performed when the input device is activated, string that corresponds to an action in actions.py
@@ -218,19 +221,19 @@ void loop() {{
         if not input_pin:
             # Solo output device, no input device
             assert len(output_pins) == 1
-            
+
             # Create output device
             pin = output_pins[0]
             device = OutputDevice(pin, None)
             self.__initialize_pin(pin, "OUTPUT")
             self.output_devices.add(device)
-            
+
             # TODO, complete
         else:
             # Input-output device connection
             # TODO: Change in future for multi-device connections
             assert len(output_pins) == 1
-            
+
             # Create input, output devices
             output_pin = output_pins[0]
             input_device = InputDevice(input_pin)
@@ -249,8 +252,9 @@ void loop() {{
             self.setup.extend(setup_code)
             self.loop.extend(loop_code)
 
+
 code = inoCodeDataStructure()
-# Any argument passed that is beyond the action string is passed as *args to the action function, 
+# Any argument passed that is beyond the action string is passed as *args to the action function,
 # and is determined by the function header in actions.py
 code.initialize_new_device_connection(11, [13], "negate_output_on_input", 50)
 print(code)
