@@ -33,4 +33,16 @@ class SendCodeToBoard(APIView):
         except Exception as e:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": str(e)})
         
+@method_decorator(csrf_exempt, name='dispatch')
+class Demo(APIView):
+    def post(self, request, *args, **kwargs):
+        try:
+            code = inoCodeDataStructure()
+            # TODO: Add demo code here, not on my machine
+            code.upload()
+            return Response(status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": str(e)})
+        
+        
 
