@@ -1,24 +1,10 @@
 import React from "react";
 import { ProjectTable } from "../components/project/ProjectTable";
 import { Link } from "react-router-dom";
+import { EXAMPLE_PROJECTS } from "../constants/example-data";
 
 export const Home: React.FC = () => {
-  const projects = [
-    {
-      id: "1",
-      name: "Atomic Structure Project",
-      inputDeviceName: "Button",
-      outputDeviceName: "Led",
-      lastModified: new Date("2024-03-14"),
-    },
-    {
-      id: "2",
-      name: "Spring Cleaning",
-      inputDeviceName: "Motion Sensor",
-      outputDeviceName: "Led Strips",
-      lastModified: new Date("2024-03-12"),
-    },
-  ];
+  const projects = EXAMPLE_PROJECTS;
 
   return (
     <>

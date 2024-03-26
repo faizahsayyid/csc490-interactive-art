@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.28.8",
+    "axios": "^1.6.8",
     "bootswatch": "^5.3.3",
     "install": "^0.13.0",
     "moment": "^2.30.1",

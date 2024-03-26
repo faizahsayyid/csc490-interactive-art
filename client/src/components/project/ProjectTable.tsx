@@ -1,6 +1,6 @@
 import React from "react";
 import ProjectRow from "./ProjectRow";
-import { Project } from "./types";
+import { Project } from "../../types/project";
 
 type ProjectTableProps = {
   projects: Project[];
