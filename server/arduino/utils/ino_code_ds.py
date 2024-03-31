@@ -3,7 +3,7 @@ import subprocess
 import os
 import serial
 import serial.tools.list_ports
-from .actions import Actions
+from actions import Actions
 
 
 class OutputDevice:
@@ -33,6 +33,7 @@ class InputDevice:
 
 
 class inoCodeDataStructure:
+    board_type: str
     def __init__(self):
         ### Code data structure ###
         self.setup: List[Union[Dict[list], str]] = []
