@@ -13,7 +13,7 @@ class Actions:
             
         }
 
-    def __demo(self, input_pin, output_pin, delay) -> tuple[list, list, list]:
+    def __demo(self, input_pin, output_pin) -> tuple[list, list, list]:
         input_pin = str(input_pin)
         output_pin = str(output_pin)
         delay = str(delay)
@@ -21,10 +21,10 @@ class Actions:
             f"digitalWrite({output_pin}, HIGH);",
             f"delay({delay});",
             f"digitalWrite({output_pin}, LOW);",
-            f"delay({delay});",
+            # f"delay({delay});",
         ])
 
-    def __negate_output_on_input_activation(self, input_pin: int, output_pin: int, delay: int) -> tuple[list, list, list]:
+    def __negate_output_on_input_activation(self, input_pin: int, output_pin: int) -> tuple[list, list, list]:
         """
         Negates the output pin when the input pin is activated
         """
@@ -39,7 +39,7 @@ class Actions:
                     f"digitalWrite({output_pin}, !outputState);",
                 ]
             },
-            f"delay({delay});",
+            # f"delay({delay});",
         ])
     
     def __blink_on_input_activation(self, input_pin: int, output_pin: int, blink_duration: int=1000, after_action: int=2) -> tuple[list, list, list]:
