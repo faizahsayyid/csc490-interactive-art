@@ -245,6 +245,7 @@ void loop() {{
             input_device.output_devices = [output_device]
             output_device.input_device = input_device
             self.__initialize_pin(input_pin, "INPUT")
+            # self.__initialize_pin(input_pin, "INPUT_PULLUP")
             self.__initialize_pin(output_pin, "OUTPUT")
 
             # TODO: Temporary code to test for single input, output for negate_output_on_input
