@@ -10,8 +10,64 @@ class Actions:
             "negate_output_on_hold": self.__negate_output_on_hold,
             "blink_on_hold": self.__blink_on_hold,
             "blink_on_double_click": self.__blink_on_double_click,
+            "fade_in_out": self.__fade_in_out,
+            "blink": self.__blink,
             
         }
+
+# ========================================================================================
+# ==================================== ACTION METHODS ===========================================
+
+    def __fade_in_out(self, output_pin: int, fade_duration: int=-1) -> tuple[list, list, list]:
+        """
+        Repeat fading the output pin in and out (without input pin activation) for a certain duration or forever if not specified
+
+        :param output_pin: The pin number of the output pin
+        :param fade_duration: The duration to fade in and out for, if not specified, it will fade in and out forever
+        """
+        output_pin = str(output_pin)
+        fade_duration = str(fade_duration)
+        return ([], [], [
+            f"int outputPin = {output_pin};",
+            f"int brightness = 0;",
+            f"int fadeAmount = 5;",
+            f"unsigned long startTime = millis();",
+            {
+                f"while (millis() - startTime < {fade_duration} || {fade_duration} == -1):": [
+                    f"analogWrite(outputPin, brightness);",
+                    f"brightness = brightness + fadeAmount;",
+                    {
+                        "if (brightness == 0 || brightness == 255)": [
+                            f"fadeAmount = -fadeAmount;",
+                        ]
+                    },
+                    f"delay(30);",
+                ]
+            },
+        ])
+    
+    def __blink(self, output_pin: int, blink_duration: int=-1) -> tuple[list, list, list]:
+        """
+        Blinks the output pin for a duration or forever if not specified
+
+        :param output_pin: The pin number of the output pin
+        :param blink_duration: The duration to blink the output pin for, if not specified, it will blink forever
+        """
+        output_pin = str(output_pin)
+        blink_duration = str(blink_duration)
+        return ([], [], [
+            f"int outputPin = {output_pin};",
+            f"unsigned long startTime = millis();",
+            {
+                f"while (millis() - startTime < {blink_duration} || {blink_duration} == -1):": [
+                    f"digitalWrite(outputPin, HIGH);",
+                    f"delay(100);",
+                    f"digitalWrite(outputPin, LOW);",
+                    f"delay(100);",
+                ]
+            },
+        ])
+
 
     def __demo(self, input_pin, output_pin) -> tuple[list, list, list]:
         input_pin = str(input_pin)
@@ -225,6 +281,7 @@ class Actions:
             },
         ])
 
+# ========================================================================================
 
     def get_action_code(self, action_key, *args, **kwargs):
         """
