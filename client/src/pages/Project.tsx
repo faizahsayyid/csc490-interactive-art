@@ -44,9 +44,9 @@ export const Project: React.FC = () => {
         </ol>
       </nav>
       <div className="d-flex justify-content-between align-items-center mt-4 mb-2">
-        <h1 className="h2">{project.name}</h1>
+        <h1 className="h2 text-success">{project.name}</h1>
         <span className="d-flex align-content-center gap-3">
-          <button className="btn btn-secondary">Edit Project Data</button>
+          <button className="btn btn-secondary">Edit Project</button>
           <button
             className="btn btn-primary d-flex align-item-center justify-content-center"
             onClick={onDownload}
@@ -154,7 +154,7 @@ export const Project: React.FC = () => {
         })}
       </div>
       <div className="mt-5">
-        <h2 className="h4 mb-3">Device Interaction Design</h2>
+        <h2 className="h4 mb-3 text-success">Device Interaction Design</h2>
         <form>
           <label className="h5 mb-2">Interaction Type</label>
           <div className="d-flex align-items-center justify-content-between">
@@ -166,17 +166,14 @@ export const Project: React.FC = () => {
             <button className="btn btn-primary">Add Interaction</button>
           </div>
         </form>
-        <div className="list-group mt-5">
+        <div className="list-group mt-4">
           <div className="list-group-item p-4">
             <form className="d-flex flex-column">
               <fieldset>
-                <div className="d-flex align-items-center justify-content-between">
-                  <legend className="h5">
-                    <span className="fw-bold">Interaction 1:</span>{" "}
-                    {actionConfig.name}
-                  </legend>
-                  <button className="btn btn-danger">Remove</button>
-                </div>
+                <legend className="h5">
+                  <span className="fw-bold">Interaction 1:</span>{" "}
+                  {actionConfig.name}
+                </legend>
               </fieldset>
               <label className="h6 mt-3 mb-2 fw-bold">Input Device</label>
               <select className="form-select">
@@ -212,9 +209,12 @@ export const Project: React.FC = () => {
                   })}
                 </>
               )}
-              <button type="submit" className="btn btn-secondary ms-auto">
-                Save
-              </button>
+              <div className="ms-auto d-flex align-items-center gap-3">
+                <button className="btn btn-secondary">Remove</button>
+                <button type="submit" className="btn btn-secondary">
+                  Save
+                </button>
+              </div>
             </form>
           </div>
         </div>
