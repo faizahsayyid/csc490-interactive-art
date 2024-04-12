@@ -3,7 +3,7 @@ import subprocess
 import os
 import serial
 import serial.tools.list_ports
-from actions import Actions
+from .actions import Actions
 
 
 class OutputDevice:
@@ -33,7 +33,7 @@ class InputDevice:
 
 
 class inoCodeDataStructure:
-    board_type: str
+
     def __init__(self):
         ### Code data structure ###
         self.setup: List[Union[Dict[list], str]] = []
@@ -65,16 +65,16 @@ class inoCodeDataStructure:
         globals = "\n".join(self.globals)
 
         return f"""
-{globals}
+                {globals}
 
-void setup() {{
-{setup_code}
-}}
+                void setup() {{
+                {setup_code}
+                }}
 
-void loop() {{
-{loop_code}
-}}
-"""
+                void loop() {{
+                {loop_code}
+                }}
+                """
 
     def __find_port(self):
         """
@@ -86,7 +86,10 @@ void loop() {{
         ports = serial.tools.list_ports.comports()
         path = "server/arduino/utils/dummy.ino"
         for port in ports:
-            if self.__upload_sketch(path, self.board_type, port.device):
+            # temporary fix; the attribute is not found
+            # board_type = self.board_type
+            board_type = "arduino:avr:nano"
+            if self.__upload_sketch(path, board_type, port.device):
                 print(f"Found port: {port.device}")
                 return port.device
         print("No port found")
@@ -258,9 +261,9 @@ void loop() {{
             self.loop.extend(loop_code)
 
 
-code = inoCodeDataStructure()
+# code = inoCodeDataStructure()
 # Any argument passed that is beyond the action string is passed as *args to the action function,
 # and is determined by the function header in actions.py
-code.initialize_new_device_connection([13], 11, "negate_output_on_input", 1000)
-print(code)
-code.upload()
+# code.initialize_new_device_connection([13], 11, "negate_output_on_input", 1000)
+# print(code)
+# code.upload()
