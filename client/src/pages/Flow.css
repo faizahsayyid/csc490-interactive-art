@@ -1,18 +1,19 @@
 .flow-container {
-    width: 100%;
-    height: 100vh;
+  width: 100%;
+  height: 100vh;
+  display: flex;
 }
 
 .node-container {
-    width: auto;
-    height: 7.5vh;
-    display: flex;
+  width: auto;
+  height: 7.5vh;
+  display: flex;
 }
 
 .image-container {
-    width: auto;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  width: auto;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

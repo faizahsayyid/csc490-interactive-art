@@ -16,11 +16,11 @@ const router = createBrowserRouter([
         element: <CreateProject />,
       },
       {
-        path: "/project/:projectId",
+        path: "/project_dep/:projectId",
         element: <Project />,
       },
       {
-        path: "/project_test",
+        path: "/project/:projectId",
         element: <Flow />,
       },
     ],
