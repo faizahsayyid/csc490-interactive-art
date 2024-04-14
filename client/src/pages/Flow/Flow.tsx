@@ -8,19 +8,20 @@ import ReactFlow, {
   useNodesState,
   useEdgesState,
 } from "reactflow";
-import { EXAMPLE_PROJECTS } from "../constants/example-data";
+import { EXAMPLE_PROJECTS } from "../../constants/example-data";
 import { useParams } from "react-router-dom";
 import {
   INPUT_DEVICE_INFO,
   INPUT_DEVICE_IMAGES,
-} from "../constants/device/input-device";
+} from "../../constants/device/input-device";
 import {
   OUTPUT_DEVICE_INFO,
   OUTPUT_DEVICE_IMAGES,
-} from "../constants/device/output-device";
-import { Modal, Button } from "react-bootstrap"; // Import Modal and Button components
+} from "../../constants/device/output-device";
+import { Modal, Button } from "react-bootstrap";
 
 import CustomNode from "./CustomNode";
+import CustomEdge from "./CustomEdge";
 import { Link } from "react-router-dom";
 import "./Flow.css";
 import "reactflow/dist/style.css";
@@ -28,6 +29,10 @@ import "reactflow/dist/style.css";
 export const Flow: React.FC = () => {
   const { projectId } = useParams();
   const project = EXAMPLE_PROJECTS[projectId ? parseInt(projectId) ?? 0 : 0];
+  const start_y = 200;
+  const y_step = 100;
+  const input_x = 200;
+  const output_x = 800;
   let inputDevices: Node[] = [];
   let outputDevices: Node[] = [];
 
@@ -42,7 +47,7 @@ export const Flow: React.FC = () => {
         description: INPUT_DEVICE_INFO[inputDevice.device].description,
         type: "input",
       },
-      position: { x: 200, y: 200 },
+      position: { x: input_x, y: start_y + (y_step * inputDevices.length)},
     };
     inputDevices.push(dict);
   }
@@ -58,7 +63,7 @@ export const Flow: React.FC = () => {
         description: OUTPUT_DEVICE_INFO[outputDevice.device].description,
         type: "output",
       },
-      position: { x: 600, y: 200 },
+      position: { x: output_x, y: start_y + (y_step * outputDevices.length) },
     };
     outputDevices.push(dict);
   }
@@ -67,17 +72,28 @@ export const Flow: React.FC = () => {
     custom: CustomNode,
   };
 
+  const edgeTypes = {
+    custom: CustomEdge,
+  };
+
   const initialNodes: Node[] = [...inputDevices, ...outputDevices];
 
   const [nodes, , onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const onConnect = useCallback(
-    (params: Edge | Connection) => setEdges((els) => addEdge(params, els)),
+    (params: Edge | Connection) => {
+      const newEdge = { ...params, type: 'custom' }; // Ensure new edges use the custom edge type
+      setEdges((els) => addEdge(newEdge, els));
+      toggleInteractionModal();
+    },
     [setEdges]
   );
-  const [showModal, setShowModal] = useState(false); // State to handle modal visibility
+  const [showDeviceModal, setShowDeviceModal] = useState(false); // State to handle modal visibility
+  const [showInteractionModal, setShowInteractionModal] = useState(false); // State to handle modal visibility
 
-  const toggleModal = () => setShowModal(!showModal);
+  const toggleDeviceModal = () => setShowDeviceModal(!showDeviceModal);
+  const toggleInteractionModal = () => setShowInteractionModal(!showInteractionModal);
+
 
   useEffect(() => {
     const updateSize = () => {
@@ -119,18 +135,19 @@ export const Flow: React.FC = () => {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         fitView={true}
       >
         <Background />
       </ReactFlow>
       <button
         className="btn btn-primary position-fixed bottom-0 end-0 me-4 mb-4 p-3"
-        onClick={toggleModal}
+        onClick={toggleDeviceModal}
       >
         Add New Device
       </button>
 
-      <Modal show={showModal} onHide={toggleModal} centered>
+      <Modal show={showDeviceModal} onHide={toggleDeviceModal} centered>
         <Modal.Header closeButton>
           <Modal.Title>Add New Device</Modal.Title>
         </Modal.Header>
@@ -139,14 +156,38 @@ export const Flow: React.FC = () => {
           {/* Form fields for device details go here */}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={toggleModal}>
+          <Button variant="secondary" onClick={toggleDeviceModal}>
             Close
           </Button>
           <Button
             variant="primary"
             onClick={() => {
               // Implement device addition logic here
-              toggleModal();
+              toggleDeviceModal();
+            }}
+          >
+            Save Changes
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showInteractionModal} onHide={toggleInteractionModal} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Define interaction</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>Define the interaction here.</p>
+          {/* Form fields for device details go here */}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={toggleInteractionModal}>
+            Close
+          </Button>
+          <Button
+            variant="primary"
+            onClick={() => {
+              // Implement device addition logic here
+              toggleInteractionModal();
             }}
           >
             Save Changes
