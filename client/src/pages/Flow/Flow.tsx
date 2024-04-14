@@ -18,7 +18,7 @@ import {
   OUTPUT_DEVICE_INFO,
   OUTPUT_DEVICE_IMAGES,
 } from "../../constants/device/output-device";
-import { Modal, Button, Form } from "react-bootstrap";
+import { Modal, Button } from "react-bootstrap";
 
 import CustomNode from "./CustomNode";
 import CustomEdge from "./CustomEdge";
@@ -26,6 +26,9 @@ import { Link } from "react-router-dom";
 import "./Flow.css";
 import "reactflow/dist/style.css";
 import DeviceModal from "./DeviceModal";
+import InteractionModal from "./InteractionModal";
+import { DeviceInfo } from "../../types/device/device";
+import { createDevice } from "./Utils"
 
 export const Flow: React.FC = () => {
   const { projectId } = useParams();
@@ -36,42 +39,35 @@ export const Flow: React.FC = () => {
   const output_x = 800;
   let inputDevices: Node[] = [];
   let outputDevices: Node[] = [];
-  const [selectedDevice, setSelectedDevice] = useState('');
-
-  const handleDeviceChange = (event: any) => {
-    setSelectedDevice(event.target.value);
-  };
 
   for (const inputDevice of project.inputDevices) {
-    const dict: Node = {
-      id: `${inputDevice.pin}`,
-      type: "custom",
-      data: {
-        label: INPUT_DEVICE_INFO[inputDevice.device].name,
-        name: INPUT_DEVICE_INFO[inputDevice.device].name,
-        image: INPUT_DEVICE_IMAGES[inputDevice.device],
-        description: INPUT_DEVICE_INFO[inputDevice.device].description,
-        type: "input",
-      },
-      position: { x: input_x, y: start_y + (y_step * inputDevices.length)},
-    };
-    inputDevices.push(dict);
+    let node: Node = createDevice(
+      inputDevice.device,
+      INPUT_DEVICE_INFO,
+      INPUT_DEVICE_IMAGES,
+      inputDevices,
+      input_x,
+      start_y,
+      y_step,
+      "input",
+      inputDevice.pin,
+    );
+    inputDevices.push(node);
   }
 
   for (const outputDevice of project.outputDevices) {
-    const dict: Node = {
-      id: `${outputDevice.pin}`,
-      type: "custom",
-      data: {
-        label: OUTPUT_DEVICE_INFO[outputDevice.device].name,
-        name: OUTPUT_DEVICE_INFO[outputDevice.device].name,
-        image: OUTPUT_DEVICE_IMAGES[outputDevice.device],
-        description: OUTPUT_DEVICE_INFO[outputDevice.device].description,
-        type: "output",
-      },
-      position: { x: output_x, y: start_y + (y_step * outputDevices.length) },
-    };
-    outputDevices.push(dict);
+    let node: Node = createDevice(
+      outputDevice.device,
+      OUTPUT_DEVICE_INFO,
+      OUTPUT_DEVICE_IMAGES,
+      outputDevices,
+      output_x,
+      start_y,
+      y_step,
+      "output",
+      outputDevice.pin,
+    );
+    outputDevices.push(node);
   }
 
   const nodeTypes = {
@@ -84,7 +80,7 @@ export const Flow: React.FC = () => {
 
   const initialNodes: Node[] = [...inputDevices, ...outputDevices];
 
-  const [nodes, , onNodesChange] = useNodesState(initialNodes);
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const onConnect = useCallback(
     (params: Edge | Connection) => {
@@ -100,16 +96,19 @@ export const Flow: React.FC = () => {
   const toggleDeviceModal = () => setShowDeviceModal(!showDeviceModal);
   const toggleInteractionModal = () => setShowInteractionModal(!showInteractionModal);
 
-  const handleAddDevice = (deviceInfo: any) => {
-    console.log('Adding device:', deviceInfo);
-    // Logic to add device to React Flow goes here
-    toggleDeviceModal();  // Close modal after adding device
+  const handleAddDevice = (deviceType: string, deviceInfo: DeviceInfo) => {
+    console.log('Adding device:', deviceType, deviceInfo);
+    toggleDeviceModal();  
+  };
+
+  const handleInteractionConfirm = () => {
+    console.log('Interaction confirmed');
+    toggleInteractionModal();  // Optionally close modal on confirm
   };
 
   useEffect(() => {
     const updateSize = () => {
       const headerHeight = document.querySelector("header")?.clientHeight;
-      console.log("Header doc: ", document.querySelector("header"));
       const flowContainer = document.querySelector(
         ".flow-container"
       ) as HTMLElement;
@@ -164,24 +163,11 @@ export const Flow: React.FC = () => {
         onAddDevice={handleAddDevice}
       />
 
-      <Modal show={showInteractionModal} onHide={toggleInteractionModal} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>Define interaction</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>Define the interaction here.</p>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            variant="primary"
-            onClick={() => {
-              toggleInteractionModal();
-            }}
-          >
-            Confirm
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <InteractionModal
+        showModal={showInteractionModal}
+        onHide={toggleInteractionModal}
+        onConfirm={handleInteractionConfirm}
+      />
     </div>
   );
 };
