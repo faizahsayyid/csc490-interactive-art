@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import ReactFlow, {
   Node,
   addEdge,
@@ -21,18 +21,19 @@ import {
 import { Modal, Button } from "react-bootstrap"; // Import Modal and Button components
 
 import CustomNode from "./CustomNode";
+import { Link } from "react-router-dom";
 import "./Flow.css";
 import "reactflow/dist/style.css";
 
 export const Flow: React.FC = () => {
   const { projectId } = useParams();
   const project = EXAMPLE_PROJECTS[projectId ? parseInt(projectId) ?? 0 : 0];
-  let inputDevices: Node[] = []; 
-  let outputDevices: Node[] = []; 
+  let inputDevices: Node[] = [];
+  let outputDevices: Node[] = [];
 
   for (const inputDevice of project.inputDevices) {
     const dict: Node = {
-      id: `${inputDevice.pin}`, 
+      id: `${inputDevice.pin}`,
       type: "custom",
       data: {
         label: INPUT_DEVICE_INFO[inputDevice.device].name,
@@ -78,8 +79,39 @@ export const Flow: React.FC = () => {
 
   const toggleModal = () => setShowModal(!showModal);
 
+  useEffect(() => {
+    const updateSize = () => {
+      const headerHeight = document.querySelector("header")?.clientHeight;
+      console.log("Header doc: ", document.querySelector("header"));
+      const flowContainer = document.querySelector(
+        ".flow-container"
+      ) as HTMLElement;
+      if (flowContainer) {
+        flowContainer.style.height = `calc(100vh - ${headerHeight}px)`;
+      }
+    };
+
+    window.addEventListener("resize", updateSize);
+    updateSize(); // Call the function once to set the initial height
+
+    return () => window.removeEventListener("resize", updateSize);
+  }, []);
+
   return (
     <div className="flow-container">
+      <div className="position-absolute top-12 start-0 ms-4 mt-2 p-3 bread">
+        <nav className="bread" aria-label="breadcrumb">
+          <ol className="breadcrumb">
+            <li className="breadcrumb-item" aria-current="page">
+              <Link to="/">Projects</Link>
+            </li>
+            <li className="breadcrumb-item active" aria-current="page">
+              {project.name}
+            </li>
+          </ol>
+        </nav>
+      </div>
+
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -87,7 +119,7 @@ export const Flow: React.FC = () => {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         nodeTypes={nodeTypes}
-        fitView
+        fitView={true}
       >
         <Background />
       </ReactFlow>
