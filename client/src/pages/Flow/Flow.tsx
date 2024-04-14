@@ -18,13 +18,14 @@ import {
   OUTPUT_DEVICE_INFO,
   OUTPUT_DEVICE_IMAGES,
 } from "../../constants/device/output-device";
-import { Modal, Button } from "react-bootstrap";
+import { Modal, Button, Form } from "react-bootstrap";
 
 import CustomNode from "./CustomNode";
 import CustomEdge from "./CustomEdge";
 import { Link } from "react-router-dom";
 import "./Flow.css";
 import "reactflow/dist/style.css";
+import DeviceModal from "./DeviceModal";
 
 export const Flow: React.FC = () => {
   const { projectId } = useParams();
@@ -35,6 +36,11 @@ export const Flow: React.FC = () => {
   const output_x = 800;
   let inputDevices: Node[] = [];
   let outputDevices: Node[] = [];
+  const [selectedDevice, setSelectedDevice] = useState('');
+
+  const handleDeviceChange = (event: any) => {
+    setSelectedDevice(event.target.value);
+  };
 
   for (const inputDevice of project.inputDevices) {
     const dict: Node = {
@@ -94,6 +100,11 @@ export const Flow: React.FC = () => {
   const toggleDeviceModal = () => setShowDeviceModal(!showDeviceModal);
   const toggleInteractionModal = () => setShowInteractionModal(!showInteractionModal);
 
+  const handleAddDevice = (deviceInfo: any) => {
+    console.log('Adding device:', deviceInfo);
+    // Logic to add device to React Flow goes here
+    toggleDeviceModal();  // Close modal after adding device
+  };
 
   useEffect(() => {
     const updateSize = () => {
@@ -147,29 +158,11 @@ export const Flow: React.FC = () => {
         Add New Device
       </button>
 
-      <Modal show={showDeviceModal} onHide={toggleDeviceModal} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>Add New Device</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>Enter the details of the new device.</p>
-          {/* Form fields for device details go here */}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={toggleDeviceModal}>
-            Close
-          </Button>
-          <Button
-            variant="primary"
-            onClick={() => {
-              // Implement device addition logic here
-              toggleDeviceModal();
-            }}
-          >
-            Save Changes
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <DeviceModal
+        showModal={showDeviceModal}
+        toggleModal={toggleDeviceModal}
+        onAddDevice={handleAddDevice}
+      />
 
       <Modal show={showInteractionModal} onHide={toggleInteractionModal} centered>
         <Modal.Header closeButton>
@@ -177,20 +170,15 @@ export const Flow: React.FC = () => {
         </Modal.Header>
         <Modal.Body>
           <p>Define the interaction here.</p>
-          {/* Form fields for device details go here */}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={toggleInteractionModal}>
-            Close
-          </Button>
           <Button
             variant="primary"
             onClick={() => {
-              // Implement device addition logic here
               toggleInteractionModal();
             }}
           >
-            Save Changes
+            Confirm
           </Button>
         </Modal.Footer>
       </Modal>

@@ -2,7 +2,6 @@ import { memo } from "react";
 import { Handle, NodeProps, Position } from "reactflow";
 import "./Flow.css";
 
-// Assuming the type of the data props might look something like this:
 interface CustomNodeData {
   name: string;
   description: string;
