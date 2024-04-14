@@ -6,7 +6,7 @@ python3 -m venv venv
 
 source venv/bin/activate
 
-# pip install django pillow djangorestframework djangorestframework-simplejwt django-environ django-cors-headers
+pip install django pillow djangorestframework djangorestframework-simplejwt django-environ django-cors-headers
 pip install -r requirements.txt
 
 ./cleanup.sh

@@ -1,0 +1,26 @@
+.rowHeader {
+  margin-top: 1rem;
+}
+
+.redDot {
+  width: 10px;
+  height: 10px;
+  background-color: red;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.inputDot {
+  right: -5px;
+}
+
+.outputDot {
+  left: -5px;
+}
+
+.cardContainer {
+  position: relative;
+}

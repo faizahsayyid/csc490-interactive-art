@@ -12,11 +12,23 @@ export const EXAMPLE_PROJECTS: Project[] = [
         device: InputDevice.BUTTON,
         pin: 11,
       },
+      {
+        device: InputDevice.BUTTON,
+        pin: 12,
+      },
     ],
     outputDevices: [
       {
         device: OutputDevice.LED,
         pin: 13,
+      },
+      {
+        device: OutputDevice.LED,
+        pin: 9,
+      },
+      {
+        device: OutputDevice.LED,
+        pin: 8,
       },
     ],
     interactions: [
