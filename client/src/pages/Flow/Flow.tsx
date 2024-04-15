@@ -30,6 +30,11 @@ import { InputDevice } from "../../types/device/input-device";
 import { OutputDevice } from "../../types/device/output-device";
 import { v4 as uuidv4 } from "uuid"; // Importing the UUID function
 
+const start_y = 200;
+const y_step = 100;
+const input_x = 200;
+const output_x = 800;
+
 const nodeTypes = {
   custom: CustomNode,
 };
@@ -38,34 +43,30 @@ const edgeTypes = {
   custom: CustomEdge,
 };
 
+interface CurrentConnection {
+  source: any | null;
+  target: any | null;
+}
+
 export const Flow: React.FC = () => {
   const { projectId } = useParams();
   const project = EXAMPLE_PROJECTS[projectId ? parseInt(projectId) ?? 0 : 0];
-  const start_y = 200;
-  const y_step = 100;
-  const input_x = 200;
-  const output_x = 800;
   const [inputDevices, setInputDevices] = useState<Node[]>([]);
   const [outputDevices, setOutputDevices] = useState<Node[]>([]);
+  const [currentConnection, setCurrentConnection] = useState<CurrentConnection>(
+    { source: null, target: null }
+  );
 
   const [showDeviceModal, setShowDeviceModal] = useState(false); // State to handle modal visibility
   const [showInteractionModal, setShowInteractionModal] = useState(false); // State to handle modal visibility
 
   const toggleDeviceModal = () => setShowDeviceModal(!showDeviceModal);
-  const toggleInteractionModal = () =>
+  const toggleInteractionModal = () => {
     setShowInteractionModal(!showInteractionModal);
+  };
 
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-
-  const onConnect = useCallback(
-    (params: Edge | Connection) => {
-      const newEdge = { ...params, type: "custom" }; // Ensure new edges use the custom edge type
-      setEdges((els) => addEdge(newEdge, els));
-      toggleInteractionModal();
-    },
-    [setEdges]
-  );
 
   useEffect(() => {
     const initialInputDevices = project.inputDevices.map(
@@ -109,9 +110,8 @@ export const Flow: React.FC = () => {
   const handleAddDevice = (deviceType: string, deviceInfo: DeviceInfo) => {
     console.log("Adding device:", deviceType, deviceInfo);
     if (deviceType === "input") {
-      let id: string = uuidv4();
       let node: Node = {
-        id: `${id}`,
+        id: uuidv4(),
         type: "custom",
         data: {
           label: deviceInfo.name,
@@ -127,9 +127,8 @@ export const Flow: React.FC = () => {
       };
       inputDevices.push(node);
     } else if (deviceType === "output") {
-      let id: string = uuidv4();
       let node: Node = {
-        id: `${id}`,
+        id: uuidv4(),
         type: "custom",
         data: {
           label: deviceInfo.name,
@@ -152,7 +151,22 @@ export const Flow: React.FC = () => {
   const handleInteractionConfirm = () => {
     console.log("Interaction confirmed");
     toggleInteractionModal(); // Optionally close modal on confirm
+    setCurrentConnection({ source: null, target: null });
   };
+
+  const onConnect = useCallback(
+    (params: Edge | Connection) => {
+      const newEdge = { ...params, type: "custom" }; // Ensure new edges use the custom edge type
+      setEdges((els) => addEdge(newEdge, els));
+
+      let sourceNode = nodes.find((node) => node.id === params.source);
+      let targetNode = nodes.find((node) => node.id === params.target);
+      
+      setCurrentConnection({ source: sourceNode, target: targetNode });
+      toggleInteractionModal();
+    },
+    [setEdges, nodes, toggleInteractionModal]
+  );
 
   useEffect(() => {
     const updateSize = () => {
@@ -166,7 +180,7 @@ export const Flow: React.FC = () => {
     };
 
     window.addEventListener("resize", updateSize);
-    updateSize(); // Call the function once to set the initial height
+    updateSize();
 
     return () => window.removeEventListener("resize", updateSize);
   }, []);
@@ -215,6 +229,8 @@ export const Flow: React.FC = () => {
         showModal={showInteractionModal}
         onHide={toggleInteractionModal}
         onConfirm={handleInteractionConfirm}
+        sourceDevice={currentConnection.source}
+        targetDevice={currentConnection.target}
       />
     </div>
   );
