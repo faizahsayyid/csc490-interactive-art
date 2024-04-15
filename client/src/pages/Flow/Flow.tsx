@@ -28,7 +28,9 @@ import InteractionModal from "./InteractionModal";
 import { DeviceInfo } from "../../types/device/device";
 import { InputDevice } from "../../types/device/input-device";
 import { OutputDevice } from "../../types/device/output-device";
-import { v4 as uuidv4 } from "uuid"; // Importing the UUID function
+import { v4 as uuidv4 } from "uuid";
+// import { Project } from "../../types/project";
+// import axios from "axios";
 
 const start_y = 200;
 const y_step = 100;
@@ -50,7 +52,18 @@ interface CurrentConnection {
 
 export const Flow: React.FC = () => {
   const { projectId } = useParams();
-  const project = EXAMPLE_PROJECTS[projectId ? parseInt(projectId) ?? 0 : 0];
+  const project_example =
+    EXAMPLE_PROJECTS[projectId ? parseInt(projectId) ?? 0 : 0];
+
+  // const [project, setProject] = useState<Project>({
+  //   id: projectId ?? 'default-project-id',
+  //   name: "",
+  //   inputDevices: [],
+  //   outputDevices: [],
+  //   interactions: [],
+  //   lastModified: new Date(),
+  // });
+
   const [inputDevices, setInputDevices] = useState<Node[]>([]);
   const [outputDevices, setOutputDevices] = useState<Node[]>([]);
   const [currentConnection, setCurrentConnection] = useState<CurrentConnection>(
@@ -69,7 +82,7 @@ export const Flow: React.FC = () => {
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
   useEffect(() => {
-    const initialInputDevices = project.inputDevices.map(
+    const initialInputDevices = project_example.inputDevices.map(
       (inputDevice, index) => ({
         id: uuidv4(),
         type: "custom",
@@ -84,7 +97,7 @@ export const Flow: React.FC = () => {
       })
     );
 
-    const initialOutputDevices = project.outputDevices.map(
+    const initialOutputDevices = project_example.outputDevices.map(
       (outputDevice, index) => ({
         id: uuidv4(),
         type: "custom",
@@ -161,7 +174,7 @@ export const Flow: React.FC = () => {
 
       let sourceNode = nodes.find((node) => node.id === params.source);
       let targetNode = nodes.find((node) => node.id === params.target);
-      
+
       setCurrentConnection({ source: sourceNode, target: targetNode });
       toggleInteractionModal();
     },
@@ -194,7 +207,7 @@ export const Flow: React.FC = () => {
               <Link to="/">Projects</Link>
             </li>
             <li className="breadcrumb-item active" aria-current="page">
-              {project.name}
+              {project_example.name}
             </li>
           </ol>
         </nav>

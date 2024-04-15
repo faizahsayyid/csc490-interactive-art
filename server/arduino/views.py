@@ -9,7 +9,8 @@ from .utils.ino_code_ds import inoCodeDataStructure
 from django.views import View
 from django.contrib.auth.decorators import login_required
 from .models import Project
-from .serializers import ProjectSerializer
+from .serializers import ProjectSerializer, InputOutputDeviceInputSerializer
+from .utils.actions import Actions
 
 @method_decorator(csrf_exempt, name='dispatch')
 class SendCodeToBoard(APIView):
@@ -36,6 +37,23 @@ class SendCodeToBoard(APIView):
             return Response(status=status.HTTP_200_OK)
         except Exception as e:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": str(e)})
+        
+@method_decorator(csrf_exempt, name='dispatch')
+class GetActionsForDevices(APIView):
+    def post(self, request, *args, **kwargs):
+        serializer = InputOutputDeviceInputSerializer(data=request.data)
+        if serializer.is_valid():
+            input_device = serializer.validated_data.get('input_device')
+            output_device = serializer.validated_data.get('output_device')
+            actions = Actions()
+            
+            actions_list = actions.get_allowed_actions_for_input_output_combo(output_device, input_device)
+            
+            return Response(actions_list, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    
         
 @method_decorator(csrf_exempt, name='dispatch')
 class Demo(APIView):
