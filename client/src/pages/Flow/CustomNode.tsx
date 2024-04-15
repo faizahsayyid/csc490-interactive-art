@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { Handle, NodeProps, Position } from "reactflow";
+import { Handle, NodeProps, Position, useReactFlow } from "reactflow";
 import "./Flow.css";
 
 interface CustomNodeData {
@@ -9,18 +9,25 @@ interface CustomNodeData {
   type: string;
 }
 
-const CustomNode = ({
-  data,
-  isConnectable,
-}: NodeProps<CustomNodeData>) => {
+const CustomNode = ({ id, data, isConnectable }: NodeProps<CustomNodeData>) => {
   const isInput: boolean = data.type === "input";
 
+  const { setNodes } = useReactFlow();
+
+  const onDelete = () => {
+    console.log("Deleting node with id: ", id);
+    setNodes((prevNodes) => prevNodes.filter((node) => node.id !== id));
+  };
+
   return (
-    <div className="p-2 rounded node-container bg-secondary">
+    <div className="node p-2 rounded node-container bg-secondary">
+      <div onClick={onDelete} className="delete-node-button">
+        ×
+      </div>
       {!isInput && (
         <Handle
           type="target"
-          position={Position.Left}  // Position the target handle on the left
+          position={Position.Left} // Position the target handle on the left
           isConnectable={isConnectable}
         />
       )}

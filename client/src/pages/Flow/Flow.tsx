@@ -28,7 +28,15 @@ import InteractionModal from "./InteractionModal";
 import { DeviceInfo } from "../../types/device/device";
 import { InputDevice } from "../../types/device/input-device";
 import { OutputDevice } from "../../types/device/output-device";
-import { v4 as uuidv4 } from 'uuid';  // Importing the UUID function
+import { v4 as uuidv4 } from "uuid"; // Importing the UUID function
+
+const nodeTypes = {
+  custom: CustomNode,
+};
+
+const edgeTypes = {
+  custom: CustomEdge,
+};
 
 export const Flow: React.FC = () => {
   const { projectId } = useParams();
@@ -40,53 +48,16 @@ export const Flow: React.FC = () => {
   const [inputDevices, setInputDevices] = useState<Node[]>([]);
   const [outputDevices, setOutputDevices] = useState<Node[]>([]);
 
-  useEffect(() => {
-    const initialInputDevices = project.inputDevices.map((inputDevice, index) => ({
-      id: uuidv4(),
-      type: "custom",
-      data: {
-        label: INPUT_DEVICE_INFO[inputDevice.device].name,
-        name: INPUT_DEVICE_INFO[inputDevice.device].name,
-        image: INPUT_DEVICE_IMAGES[inputDevice.device],
-        description: INPUT_DEVICE_INFO[inputDevice.device].description,
-        type: "input",
-      },
-      position: { x: input_x, y: start_y + (y_step * index) },
-    }));
-  
-    const initialOutputDevices = project.outputDevices.map((outputDevice, index) => ({
-      id: uuidv4(),
-      type: "custom",
-      data: {
-        label: OUTPUT_DEVICE_INFO[outputDevice.device].name,
-        name: OUTPUT_DEVICE_INFO[outputDevice.device].name,
-        image: OUTPUT_DEVICE_IMAGES[outputDevice.device],
-        description: OUTPUT_DEVICE_INFO[outputDevice.device].description,
-        type: "output",
-      },
-      position: { x: output_x, y: start_y + (y_step * index) },
-    }));
-  
-    setInputDevices(initialInputDevices);
-    setOutputDevices(initialOutputDevices);
-  }, []);
+  const [showDeviceModal, setShowDeviceModal] = useState(false); // State to handle modal visibility
+  const [showInteractionModal, setShowInteractionModal] = useState(false); // State to handle modal visibility
 
-  const nodeTypes = {
-    custom: CustomNode,
-  };
-
-  const edgeTypes = {
-    custom: CustomEdge,
-  };
+  const toggleDeviceModal = () => setShowDeviceModal(!showDeviceModal);
+  const toggleInteractionModal = () =>
+    setShowInteractionModal(!showInteractionModal);
 
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
-
-  useEffect(() => {
-    // Combine input and output devices into nodes only when either array changes
-    setNodes([...inputDevices, ...outputDevices]);
-  }, [inputDevices, outputDevices]);
-
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+
   const onConnect = useCallback(
     (params: Edge | Connection) => {
       const newEdge = { ...params, type: "custom" }; // Ensure new edges use the custom edge type
@@ -95,12 +66,45 @@ export const Flow: React.FC = () => {
     },
     [setEdges]
   );
-  const [showDeviceModal, setShowDeviceModal] = useState(false); // State to handle modal visibility
-  const [showInteractionModal, setShowInteractionModal] = useState(false); // State to handle modal visibility
 
-  const toggleDeviceModal = () => setShowDeviceModal(!showDeviceModal);
-  const toggleInteractionModal = () =>
-    setShowInteractionModal(!showInteractionModal);
+  useEffect(() => {
+    const initialInputDevices = project.inputDevices.map(
+      (inputDevice, index) => ({
+        id: uuidv4(),
+        type: "custom",
+        data: {
+          label: INPUT_DEVICE_INFO[inputDevice.device].name,
+          name: INPUT_DEVICE_INFO[inputDevice.device].name,
+          image: INPUT_DEVICE_IMAGES[inputDevice.device],
+          description: INPUT_DEVICE_INFO[inputDevice.device].description,
+          type: "input",
+        },
+        position: { x: input_x, y: start_y + y_step * index },
+      })
+    );
+
+    const initialOutputDevices = project.outputDevices.map(
+      (outputDevice, index) => ({
+        id: uuidv4(),
+        type: "custom",
+        data: {
+          label: OUTPUT_DEVICE_INFO[outputDevice.device].name,
+          name: OUTPUT_DEVICE_INFO[outputDevice.device].name,
+          image: OUTPUT_DEVICE_IMAGES[outputDevice.device],
+          description: OUTPUT_DEVICE_INFO[outputDevice.device].description,
+          type: "output",
+        },
+        position: { x: output_x, y: start_y + y_step * index },
+      })
+    );
+
+    setInputDevices(initialInputDevices);
+    setOutputDevices(initialOutputDevices);
+  }, []);
+
+  useEffect(() => {
+    setNodes([...inputDevices, ...outputDevices]);
+  }, [inputDevices, outputDevices]);
 
   const handleAddDevice = (deviceType: string, deviceInfo: DeviceInfo) => {
     console.log("Adding device:", deviceType, deviceInfo);
@@ -112,7 +116,10 @@ export const Flow: React.FC = () => {
         data: {
           label: deviceInfo.name,
           name: deviceInfo.name,
-          image: INPUT_DEVICE_IMAGES[deviceInfo.name.toUpperCase() as InputDevice],
+          image:
+            INPUT_DEVICE_IMAGES[
+              deviceInfo.name.toUpperCase().replace(" ", "_") as InputDevice
+            ],
           description: deviceInfo.description,
           type: "input",
         },
@@ -127,7 +134,10 @@ export const Flow: React.FC = () => {
         data: {
           label: deviceInfo.name,
           name: deviceInfo.name,
-          image: OUTPUT_DEVICE_IMAGES[deviceInfo.name.toUpperCase() as OutputDevice],
+          image:
+            OUTPUT_DEVICE_IMAGES[
+              deviceInfo.name.toUpperCase().replace(" ", "_") as OutputDevice
+            ],
           description: deviceInfo.description,
           type: "output",
         },
