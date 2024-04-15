@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'arduino',
     'corsheaders',
+    'rest_framework',
+    'accounts',
 ]
 
 MIDDLEWARE = [
