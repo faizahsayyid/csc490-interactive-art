@@ -9,7 +9,7 @@ from .utils.ino_code_ds import inoCodeDataStructure
 from django.views import View
 from django.contrib.auth.decorators import login_required
 from .models import Project
-from .serializers import ProjectSerializer, InputOutputDeviceInputSerializer
+from .serializers import ProjectSerializer, InputOutputDeviceInputSerializer, ParamsFromActionSerializer
 from .utils.actions import Actions
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -52,7 +52,25 @@ class GetActionsForDevices(APIView):
             return Response(actions_list, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+@method_decorator(csrf_exempt, name='dispatch')
+class GetRequiredAdditionalParamsForActions(APIView):
+    def post(self, request, *args, **kwargs):
+        serializer = ParamsFromActionSerializer(data=request.data)
+        if serializer.is_valid():
+            action_key = serializer.validated_data.get('action_key')
+            actions = Actions()
+            
+            params: dict = actions.get_arg_list_for_action(action_key)
+            params = {k: v.__name__ for k, v in params.items()}
+            if "input_pin" in params:
+                params.pop("input_pin")
+            if "output_pin" in params:
+                params.pop("output_pin")
+            
+            return Response(params, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
         
 @method_decorator(csrf_exempt, name='dispatch')

@@ -11,3 +11,6 @@ class InputOutputDeviceInputSerializer(serializers.Serializer):
     input_device = serializers.CharField(required=False, allow_null=True)
     output_device = serializers.CharField()
     
+class ParamsFromActionSerializer(serializers.Serializer):
+    action_key = serializers.CharField()
+    

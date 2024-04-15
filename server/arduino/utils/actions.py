@@ -144,7 +144,8 @@ class Actions:
             ],
         )
 
-    def __negate_output_on_input_activation(self, input_pin: int, output_pin: int) -> tuple[list, list, list]:
+    # TODO: rm delay
+    def __negate_output_on_input_activation(self, input_pin: int, output_pin: int, delay: int) -> tuple[list, list, list]:
         """
         Negates the output pin when the input pin is activated
         """
