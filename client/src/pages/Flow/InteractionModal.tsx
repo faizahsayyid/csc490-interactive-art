@@ -27,6 +27,12 @@ const InteractionModal: React.FC<InteractionModalProps> = ({
   const [parameterValues, setParameterValues] = useState<Record<string, any>>({});
 
   useEffect(() => {
+    setSelectedAction("[select]");
+    setActionParameters({});
+    setParameterValues({});
+  }, [showModal]);
+
+  useEffect(() => {
     if (showModal) {
       const requestBody = {
         input_device: sourceDevice.data.name.replace(" ", "_").toLowerCase(),
