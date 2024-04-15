@@ -1,11 +1,11 @@
 import { createBrowserRouter } from "react-router-dom";
 import { Root } from "../layout/Root";
-import { Home, Project, CreateProject, ProjectDevices } from "../pages";
+import { Home, Project, CreateProject, Flow } from "../pages";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Root />, 
+    element: <Root />,
     children: [
       {
         path: "/",
@@ -16,12 +16,12 @@ const router = createBrowserRouter([
         element: <CreateProject />,
       },
       {
-        path: "/project/:projectId",
+        path: "/project_dep/:projectId",
         element: <Project />,
       },
       {
-        path: "/project_test/:projectId",
-        element: <ProjectDevices />,
+        path: "/project/:projectId",
+        element: <Flow />,
       },
     ],
   },

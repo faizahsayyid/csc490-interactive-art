@@ -1,3 +1,5 @@
 venv/
 *.pyc
 **/migrations/[^__init__]*.py
+pyproject.toml
+.vscode

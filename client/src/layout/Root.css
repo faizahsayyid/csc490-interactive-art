@@ -1,0 +1,5 @@
+.full-width-container {
+    width: 100vw;
+    margin: 0 auto;
+    min-height: 50vh;
+}
