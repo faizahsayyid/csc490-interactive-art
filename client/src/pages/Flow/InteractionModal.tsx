@@ -98,7 +98,7 @@ const InteractionModal: React.FC<InteractionModalProps> = ({
           )}
           {selectedAction !== "[select]" && Object.entries(actionParameters).map(([param, type]) => (
             <Form.Group controlId={`param-${param}`} key={param} className="mb-2">
-              <Form.Label>{param} ({type})</Form.Label>
+              <Form.Label>{param} ({`${type}`})</Form.Label>
               <Form.Control
                 type="number"
                 value={parameterValues[param]}
