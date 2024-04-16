@@ -186,14 +186,11 @@ export const Flow: React.FC = () => {
   };
 
   const handleCancelInteraction = () => {
+    console.log("Cancelling interaction: ", lastAddedEdge);
     if (lastAddedEdge) {
       setEdges((currentEdges) => {
         const newEdges = currentEdges.filter(
-          (edge) =>
-            !(
-              edge.source === lastAddedEdge.sourceNodeId &&
-              edge.target === lastAddedEdge.targetNodeID
-            )
+          (edge) => edge.id !== lastAddedEdge
         );
         return newEdges;
       });
@@ -204,13 +201,11 @@ export const Flow: React.FC = () => {
 
   const onConnect = useCallback(
     (params: Edge | Connection) => {
-      const newEdge = { ...params, type: "custom" };
+      const newEdge = { ...params, id: uuidv4(), type: "custom" };
       setEdges((els) => {
         const updatedEdges = addEdge(newEdge, els);
-        setLastAddedEdge({
-          sourceNodeId: newEdge.source,
-          targetNodeID: newEdge.target,
-        });
+        console.log("new edge id:");
+        setLastAddedEdge(newEdge.id);
         return updatedEdges;
       });
 
