@@ -41,16 +41,18 @@ const nodeTypes = {
   custom: CustomNode,
 };
 
-const edgeTypes = {
-  custom: CustomEdge,
-};
+// const edgeTypes = {
+//   custom: CustomEdge,
+// };
 
 interface CurrentConnection {
+  id: string | null;
   source: any | null;
   target: any | null;
 }
 
 interface Interaction {
+  id: string; // Same as id of edge
   sourceDevice: Node;
   targetDevice: Node;
   action_key: string;
@@ -74,7 +76,7 @@ export const Flow: React.FC = () => {
   const [inputDevices, setInputDevices] = useState<Node[]>([]);
   const [outputDevices, setOutputDevices] = useState<Node[]>([]);
   const [currentConnection, setCurrentConnection] = useState<CurrentConnection>(
-    { source: null, target: null }
+    { id: null, source: null, target: null }
   );
   const [allInteractions, setAllInteractions] = useState<Interaction[]>([]);
 
@@ -90,6 +92,12 @@ export const Flow: React.FC = () => {
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
   const [lastAddedEdge, setLastAddedEdge] = useState<any | null>(null);
+
+  useEffect(() => {
+    if (allInteractions.length !== edges.length) {
+      alert("Error: Interaction count does not match edge count");
+    }
+  }, [allInteractions, edges]);
 
   useEffect(() => {
     const initialInputDevices = project_example.inputDevices.map(
@@ -129,6 +137,23 @@ export const Flow: React.FC = () => {
   useEffect(() => {
     setNodes([...inputDevices, ...outputDevices]);
   }, [inputDevices, outputDevices]);
+
+  useEffect(() => {
+    const updateSize = () => {
+      const headerHeight = document.querySelector("header")?.clientHeight;
+      const flowContainer = document.querySelector(
+        ".flow-container"
+      ) as HTMLElement;
+      if (flowContainer) {
+        flowContainer.style.height = `calc(100vh - ${headerHeight}px)`;
+      }
+    };
+
+    window.addEventListener("resize", updateSize);
+    updateSize();
+
+    return () => window.removeEventListener("resize", updateSize);
+  }, []);
 
   const handleAddDevice = (deviceType: string, deviceInfo: DeviceInfo) => {
     console.log("Adding device:", deviceType, deviceInfo);
@@ -171,7 +196,18 @@ export const Flow: React.FC = () => {
     toggleDeviceModal();
   };
 
+  const handleEdgeDelete = useCallback(
+    (edgeId: string) => {
+      setEdges((prevEdges) => prevEdges.filter((edge) => edge.id !== edgeId));
+      setAllInteractions((prevInteractions) =>
+        prevInteractions.filter((interaction) => interaction.id !== edgeId)
+      );
+    },
+    [setEdges, setAllInteractions]
+  );
+
   const handleInteractionConfirm = (
+    id: string,
     sourceDevice: any,
     targetDevice: any,
     action_key: string,
@@ -179,10 +215,10 @@ export const Flow: React.FC = () => {
   ) => {
     setAllInteractions([
       ...allInteractions,
-      { sourceDevice, targetDevice, action_key, args },
+      { id, sourceDevice, targetDevice, action_key, args },
     ]);
     toggleInteractionModal();
-    setCurrentConnection({ source: null, target: null });
+    setCurrentConnection({ id: null, source: null, target: null });
   };
 
   const handleCancelInteraction = () => {
@@ -204,7 +240,6 @@ export const Flow: React.FC = () => {
       const newEdge = { ...params, id: uuidv4(), type: "custom" };
       setEdges((els) => {
         const updatedEdges = addEdge(newEdge, els);
-        console.log("new edge id:");
         setLastAddedEdge(newEdge.id);
         return updatedEdges;
       });
@@ -212,28 +247,15 @@ export const Flow: React.FC = () => {
       let sourceNode = nodes.find((node) => node.id === params.source);
       let targetNode = nodes.find((node) => node.id === params.target);
 
-      setCurrentConnection({ source: sourceNode, target: targetNode });
+      setCurrentConnection({
+        id: newEdge.id,
+        source: sourceNode,
+        target: targetNode,
+      });
       toggleInteractionModal();
     },
     [setEdges, nodes, toggleInteractionModal]
   );
-
-  useEffect(() => {
-    const updateSize = () => {
-      const headerHeight = document.querySelector("header")?.clientHeight;
-      const flowContainer = document.querySelector(
-        ".flow-container"
-      ) as HTMLElement;
-      if (flowContainer) {
-        flowContainer.style.height = `calc(100vh - ${headerHeight}px)`;
-      }
-    };
-
-    window.addEventListener("resize", updateSize);
-    updateSize();
-
-    return () => window.removeEventListener("resize", updateSize);
-  }, []);
 
   return (
     <div className="flow-container">
@@ -257,7 +279,11 @@ export const Flow: React.FC = () => {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         nodeTypes={nodeTypes}
-        edgeTypes={edgeTypes}
+        edgeTypes={{
+          custom: (edgeProps) => (
+            <CustomEdge {...edgeProps} onDelete={handleEdgeDelete} />
+          ),
+        }}
         fitView={true}
       >
         <Background />
@@ -279,6 +305,7 @@ export const Flow: React.FC = () => {
         showModal={showInteractionModal}
         onHide={handleCancelInteraction}
         onConfirm={handleInteractionConfirm}
+        id={currentConnection.id}
         sourceDevice={currentConnection.source}
         targetDevice={currentConnection.target}
       />

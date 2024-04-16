@@ -6,10 +6,14 @@ import axios from "axios";
 interface InteractionModalProps {
   showModal: boolean;
   onHide: () => void;
-  onConfirm: (sourceDevice: Node,
+  onConfirm: (
+    id: string,
+    sourceDevice: Node,
     targetDevice: Node,
     action_key: string,
-    args: any[]) => void;
+    args: any[]
+  ) => void;
+  id: string | null;
   sourceDevice: any;
   targetDevice: any;
 }
@@ -18,6 +22,7 @@ const InteractionModal: React.FC<InteractionModalProps> = ({
   showModal,
   onHide,
   onConfirm,
+  id,
   sourceDevice,
   targetDevice,
 }) => {
@@ -27,7 +32,9 @@ const InteractionModal: React.FC<InteractionModalProps> = ({
   const [allowedActions, setAllowedActions] = useState<string[]>([]);
   const [selectedAction, setSelectedAction] = useState<string>("[select]");
   const [actionParameters, setActionParameters] = useState<any>({});
-  const [parameterValues, setParameterValues] = useState<Record<string, any>>({});
+  const [parameterValues, setParameterValues] = useState<Record<string, any>>(
+    {}
+  );
 
   useEffect(() => {
     setSelectedAction("[select]");
@@ -74,16 +81,22 @@ const InteractionModal: React.FC<InteractionModalProps> = ({
 
   const handleParameterValueChange = (param: string, value: string) => {
     const newValue = parseInt(value, 10);
-    setParameterValues(prev => ({
+    setParameterValues((prev) => ({
       ...prev,
-      [param]: newValue
+      [param]: newValue,
     }));
   };
 
   const handleConfirm = () => {
     if (selectedAction !== "[select]") {
-      const args = Object.keys(actionParameters).map(key => parameterValues[key]);
-      onConfirm(sourceDevice, targetDevice, selectedAction, args);
+      const args = Object.keys(actionParameters).map(
+        (key) => parameterValues[key]
+      );
+      if (id) {
+        onConfirm(id, sourceDevice, targetDevice, selectedAction, args);
+      } else {
+        alert("Error: Interaction ID not provided.");
+      }
     } else {
       alert("Select an interaction before confirming.");
     }
@@ -114,16 +127,25 @@ const InteractionModal: React.FC<InteractionModalProps> = ({
               </Form.Control>
             </Form.Group>
           )}
-          {selectedAction !== "[select]" && Object.entries(actionParameters).map(([param, type]) => (
-            <Form.Group controlId={`param-${param}`} key={param} className="mb-2">
-              <Form.Label>{param} ({`${type}`})</Form.Label>
-              <Form.Control
-                type="number"
-                value={parameterValues[param]}
-                onChange={(e) => handleParameterValueChange(param, e.target.value)}
-              />
-            </Form.Group>
-          ))}
+          {selectedAction !== "[select]" &&
+            Object.entries(actionParameters).map(([param, type]) => (
+              <Form.Group
+                controlId={`param-${param}`}
+                key={param}
+                className="mb-2"
+              >
+                <Form.Label>
+                  {param} ({`${type}`})
+                </Form.Label>
+                <Form.Control
+                  type="number"
+                  value={parameterValues[param]}
+                  onChange={(e) =>
+                    handleParameterValueChange(param, e.target.value)
+                  }
+                />
+              </Form.Group>
+            ))}
         </Form>
       </Modal.Body>
       <Modal.Footer>
