@@ -73,8 +73,6 @@ export const Flow: React.FC = () => {
   //   lastModified: new Date(),
   // });
 
-  const [inputDevices, setInputDevices] = useState<Node[]>([]);
-  const [outputDevices, setOutputDevices] = useState<Node[]>([]);
   const [currentConnection, setCurrentConnection] = useState<CurrentConnection>(
     { id: null, source: null, target: null }
   );
@@ -90,6 +88,12 @@ export const Flow: React.FC = () => {
 
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+
+  const numInputDevices: number = nodes.filter(node => node.data.type === "input").length;
+  const numOutputDevices: number = nodes.filter(node => node.data.type === "output").length;
+  if (numInputDevices + numOutputDevices !== nodes.length) {
+    console.error("Error: Incorrect number of input and output devices");
+  }
 
   const [lastAddedEdge, setLastAddedEdge] = useState<any | null>(null);
 
@@ -130,13 +134,8 @@ export const Flow: React.FC = () => {
       })
     );
 
-    setInputDevices(initialInputDevices);
-    setOutputDevices(initialOutputDevices);
+    setNodes([...initialInputDevices, ...initialOutputDevices]);
   }, []);
-
-  useEffect(() => {
-    setNodes([...inputDevices, ...outputDevices]);
-  }, [inputDevices, outputDevices]);
 
   useEffect(() => {
     const updateSize = () => {
@@ -171,9 +170,10 @@ export const Flow: React.FC = () => {
           description: deviceInfo.description,
           type: "input",
         },
-        position: { x: input_x, y: start_y + y_step * inputDevices.length },
+        position: { x: input_x, y: start_y + y_step * numInputDevices },
       };
-      inputDevices.push(node);
+      const newNodes = [...nodes, node];
+      setNodes(newNodes);
     } else if (deviceType === "output") {
       let node: Node = {
         id: uuidv4(),
@@ -188,11 +188,11 @@ export const Flow: React.FC = () => {
           description: deviceInfo.description,
           type: "output",
         },
-        position: { x: output_x, y: start_y + y_step * outputDevices.length },
+        position: { x: output_x, y: start_y + y_step * numOutputDevices },
       };
-      outputDevices.push(node);
+      const newNodes = [...nodes, node];
+      setNodes(newNodes);
     }
-    setNodes([...inputDevices, ...outputDevices]);
     toggleDeviceModal();
   };
 
