@@ -11,7 +11,7 @@ export type Interaction = {
 
 export type DeviceConfig<T> = {
   device: T;
-  pin?: number;
+  id?: number;
 };
 
 export type Project = {

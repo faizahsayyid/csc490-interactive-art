@@ -10,25 +10,25 @@ export const EXAMPLE_PROJECTS: Project[] = [
     inputDevices: [
       {
         device: InputDevice.BUTTON,
-        pin: 11,
+        id: 11,
       },
       {
         device: InputDevice.BUTTON,
-        pin: 12,
+        id: 12,
       },
     ],
     outputDevices: [
       {
         device: OutputDevice.LED,
-        pin: 13,
+        id: 13,
       },
       {
         device: OutputDevice.LED,
-        pin: 9,
+        id: 9,
       },
       {
         device: OutputDevice.LED,
-        pin: 8,
+        id: 8,
       },
     ],
     interactions: [
@@ -36,11 +36,11 @@ export const EXAMPLE_PROJECTS: Project[] = [
         action: Action.NEGATE_OUTPUT_ON_INPUT,
         inputDeviceConfig: {
           device: InputDevice.BUTTON,
-          pin: 11,
+          id: 11,
         },
         outputDeviceConfig: {
           device: OutputDevice.LED,
-          pin: 13,
+          id: 13,
         },
         additionalVariables: {
           delay: "1000",

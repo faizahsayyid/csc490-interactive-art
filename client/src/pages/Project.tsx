@@ -96,7 +96,7 @@ export const Project: React.FC = () => {
                     name="pin1"
                     id="pin1"
                     min={0}
-                    defaultValue={deviceConfig.pin}
+                    defaultValue={deviceConfig.id}
                   />
                   <button className="btn btn-secondary" type="submit">
                     Save
@@ -142,7 +142,7 @@ export const Project: React.FC = () => {
                     name="pin1"
                     id="pin1"
                     min={0}
-                    defaultValue={deviceConfig.pin}
+                    defaultValue={deviceConfig.id}
                   />
                   <button className="btn btn-secondary" type="submit">
                     Save
