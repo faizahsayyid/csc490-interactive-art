@@ -29,6 +29,7 @@ import { DeviceInfo } from "../../types/device/device";
 import { InputDevice } from "../../types/device/input-device";
 import { OutputDevice } from "../../types/device/output-device";
 import { v4 as uuidv4 } from "uuid";
+import { ActionVariable } from "../../types/action";
 // import { Project } from "../../types/project";
 // import axios from "axios";
 
@@ -51,11 +52,11 @@ interface CurrentConnection {
   target: any | null;
 }
 
-interface Interaction {
+interface InteractionFlow {
   id: string; // Same as id of edge
   sourceDevice: Node;
   targetDevice: Node;
-  action_key: string;
+  action: ActionVariable;
   args: any[];
 }
 
@@ -65,8 +66,8 @@ export const Flow: React.FC = () => {
     EXAMPLE_PROJECTS[projectId ? parseInt(projectId) ?? 0 : 0];
 
   // const [project, setProject] = useState<Project>({
-  //   id: projectId ?? 'default-project-id',
-  //   name: "",
+  //   id: projectId ?? "default-project-id",
+  //   name: project_example.name,
   //   inputDevices: [],
   //   outputDevices: [],
   //   interactions: [],
@@ -76,7 +77,7 @@ export const Flow: React.FC = () => {
   const [currentConnection, setCurrentConnection] = useState<CurrentConnection>(
     { id: null, source: null, target: null }
   );
-  const [allInteractions, setAllInteractions] = useState<Interaction[]>([]);
+  const [interactions, setInteractions] = useState<InteractionFlow[]>([]);
 
   const [showDeviceModal, setShowDeviceModal] = useState(false); // State to handle modal visibility
   const [showInteractionModal, setShowInteractionModal] = useState(false); // State to handle modal visibility
@@ -89,19 +90,37 @@ export const Flow: React.FC = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
-  const numInputDevices: number = nodes.filter(node => node.data.type === "input").length;
-  const numOutputDevices: number = nodes.filter(node => node.data.type === "output").length;
+  const numInputDevices: number = nodes.filter(
+    (node) => node.data.type === "input"
+  ).length;
+  const numOutputDevices: number = nodes.filter(
+    (node) => node.data.type === "output"
+  ).length;
   if (numInputDevices + numOutputDevices !== nodes.length) {
     console.error("Error: Incorrect number of input and output devices");
   }
 
+  useEffect(() => {
+    let inputDevices = nodes.filter((node) => node.data.type === "input");
+    let outputDevices = nodes.filter((node) => node.data.type === "output");
+    console.log("Input devices:", inputDevices);
+    console.log("Output devices:", outputDevices);
+    // setProject({
+    //   ...project,
+    //   inputDevices: inputDevices.map((device) => device.data),
+    //   outputDevices: outputDevices.map((device) => device.data),
+    //   interactions: interactions,
+    //   lastModified: new Date(),
+    // });
+  }, [nodes, edges, interactions]);
+
   const [lastAddedEdge, setLastAddedEdge] = useState<any | null>(null);
 
   useEffect(() => {
-    if (allInteractions.length !== edges.length) {
+    if (interactions.length !== edges.length && !currentConnection.id) {
       alert("Error: Interaction count does not match edge count");
     }
-  }, [allInteractions, edges]);
+  }, [interactions, edges]);
 
   useEffect(() => {
     const initialInputDevices = project_example.inputDevices.map(
@@ -199,23 +218,23 @@ export const Flow: React.FC = () => {
   const handleEdgeDelete = useCallback(
     (edgeId: string) => {
       setEdges((prevEdges) => prevEdges.filter((edge) => edge.id !== edgeId));
-      setAllInteractions((prevInteractions) =>
+      setInteractions((prevInteractions) =>
         prevInteractions.filter((interaction) => interaction.id !== edgeId)
       );
     },
-    [setEdges, setAllInteractions]
+    [setEdges, setInteractions]
   );
 
   const handleInteractionConfirm = (
     id: string,
     sourceDevice: any,
     targetDevice: any,
-    action_key: string,
+    action: ActionVariable,
     args: any[]
   ) => {
-    setAllInteractions([
-      ...allInteractions,
-      { id, sourceDevice, targetDevice, action_key, args },
+    setInteractions([
+      ...interactions,
+      { id, sourceDevice, targetDevice, action, args },
     ]);
     toggleInteractionModal();
     setCurrentConnection({ id: null, source: null, target: null });

@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import axios from "axios";
+import { ActionVariable, ActionVariableType } from "../../types/action";
 
 interface InteractionModalProps {
   showModal: boolean;
@@ -10,7 +11,7 @@ interface InteractionModalProps {
     id: string,
     sourceDevice: Node,
     targetDevice: Node,
-    action_key: string,
+    action: ActionVariable,
     args: any[]
   ) => void;
   id: string | null;
@@ -30,15 +31,17 @@ const InteractionModal: React.FC<InteractionModalProps> = ({
     return null;
   }
   const [allowedActions, setAllowedActions] = useState<string[]>([]);
-  const [selectedAction, setSelectedAction] = useState<string>("[select]");
-  const [actionParameters, setActionParameters] = useState<any>({});
+  const [selectedAction, setSelectedAction] = useState<ActionVariable>({name: "[select]", type: "boolean", description: ""});
+  const [actionParameters, setActionParameters] = useState<ActionVariable[]>(
+    []
+  );
   const [parameterValues, setParameterValues] = useState<Record<string, any>>(
     {}
   );
 
   useEffect(() => {
-    setSelectedAction("[select]");
-    setActionParameters({});
+    setSelectedAction({name: "[select]", type: "boolean", description: ""});
+    setActionParameters([]);
     setParameterValues({});
   }, [showModal]);
 
@@ -62,7 +65,7 @@ const InteractionModal: React.FC<InteractionModalProps> = ({
   }, [showModal]);
 
   useEffect(() => {
-    if (selectedAction !== "[select]") {
+    if (selectedAction.name !== "[select]") {
       const requestBody = {
         action_key: selectedAction,
       };
@@ -71,7 +74,16 @@ const InteractionModal: React.FC<InteractionModalProps> = ({
         .post("http://127.0.0.1:8000/arduino/action-params/", requestBody)
         .then((response) => {
           console.log("Response:", response.data);
-          setActionParameters(response.data);
+          let ActionVariables: ActionVariable[] = [];
+          for (const key in response.data) {
+            const actionType: ActionVariableType = response.data[key];
+            ActionVariables.push({
+              name: key,
+              type: actionType,
+              description: "",
+            });
+          }
+          setActionParameters(ActionVariables);
         })
         .catch((error) => {
           console.error("Error in axios post:", error);
@@ -88,7 +100,7 @@ const InteractionModal: React.FC<InteractionModalProps> = ({
   };
 
   const handleConfirm = () => {
-    if (selectedAction !== "[select]") {
+    if (selectedAction.name !== "[select]") {
       const args = Object.keys(actionParameters).map(
         (key) => parameterValues[key]
       );
@@ -117,7 +129,7 @@ const InteractionModal: React.FC<InteractionModalProps> = ({
               <Form.Label>Select Interaction</Form.Label>
               <Form.Control
                 as="select"
-                value={selectedAction}
+                value={selectedAction.name}
                 onChange={(event: any) => setSelectedAction(event.target.value)}
               >
                 <option value="[select]">[select]</option>
@@ -127,21 +139,21 @@ const InteractionModal: React.FC<InteractionModalProps> = ({
               </Form.Control>
             </Form.Group>
           )}
-          {selectedAction !== "[select]" &&
-            Object.entries(actionParameters).map(([param, type]) => (
+          {selectedAction.name !== "[select]" &&
+            actionParameters.map((action) => (
               <Form.Group
-                controlId={`param-${param}`}
-                key={param}
+                controlId={`param-${action.name}`}
+                key={action.name}
                 className="mb-2"
               >
                 <Form.Label>
-                  {param} ({`${type}`})
+                  {action.name} ({`${action.type}`})
                 </Form.Label>
                 <Form.Control
-                  type="number"
-                  value={parameterValues[param]}
+                  type={action.type}
+                  value={parameterValues[action.name]}
                   onChange={(e) =>
-                    handleParameterValueChange(param, e.target.value)
+                    handleParameterValueChange(action.name, e.target.value)
                   }
                 />
               </Form.Group>
