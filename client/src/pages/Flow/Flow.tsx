@@ -50,6 +50,13 @@ interface CurrentConnection {
   target: any | null;
 }
 
+interface Interaction {
+  sourceDevice: Node;
+  targetDevice: Node;
+  action_key: string;
+  args: any[];
+}
+
 export const Flow: React.FC = () => {
   const { projectId } = useParams();
   const project_example =
@@ -69,6 +76,7 @@ export const Flow: React.FC = () => {
   const [currentConnection, setCurrentConnection] = useState<CurrentConnection>(
     { source: null, target: null }
   );
+  const [allInteractions, setAllInteractions] = useState<Interaction[]>([]);
 
   const [showDeviceModal, setShowDeviceModal] = useState(false); // State to handle modal visibility
   const [showInteractionModal, setShowInteractionModal] = useState(false); // State to handle modal visibility
@@ -80,6 +88,8 @@ export const Flow: React.FC = () => {
 
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+
+  const [lastAddedEdge, setLastAddedEdge] = useState<any | null>(null);
 
   useEffect(() => {
     const initialInputDevices = project_example.inputDevices.map(
@@ -161,16 +171,48 @@ export const Flow: React.FC = () => {
     toggleDeviceModal();
   };
 
-  const handleInteractionConfirm = () => {
-    console.log("Interaction confirmed");
-    toggleInteractionModal(); // Optionally close modal on confirm
+  const handleInteractionConfirm = (
+    sourceDevice: any,
+    targetDevice: any,
+    action_key: string,
+    args: any[]
+  ) => {
+    setAllInteractions([
+      ...allInteractions,
+      { sourceDevice, targetDevice, action_key, args },
+    ]);
+    toggleInteractionModal();
     setCurrentConnection({ source: null, target: null });
+  };
+
+  const handleCancelInteraction = () => {
+    if (lastAddedEdge) {
+      setEdges((currentEdges) => {
+        const newEdges = currentEdges.filter(
+          (edge) =>
+            !(
+              edge.source === lastAddedEdge.sourceNodeId &&
+              edge.target === lastAddedEdge.targetNodeID
+            )
+        );
+        return newEdges;
+      });
+      setLastAddedEdge(null);
+    }
+    toggleInteractionModal();
   };
 
   const onConnect = useCallback(
     (params: Edge | Connection) => {
-      const newEdge = { ...params, type: "custom" }; // Ensure new edges use the custom edge type
-      setEdges((els) => addEdge(newEdge, els));
+      const newEdge = { ...params, type: "custom" };
+      setEdges((els) => {
+        const updatedEdges = addEdge(newEdge, els);
+        setLastAddedEdge({
+          sourceNodeId: newEdge.source,
+          targetNodeID: newEdge.target,
+        });
+        return updatedEdges;
+      });
 
       let sourceNode = nodes.find((node) => node.id === params.source);
       let targetNode = nodes.find((node) => node.id === params.target);
@@ -240,7 +282,7 @@ export const Flow: React.FC = () => {
 
       <InteractionModal
         showModal={showInteractionModal}
-        onHide={toggleInteractionModal}
+        onHide={handleCancelInteraction}
         onConfirm={handleInteractionConfirm}
         sourceDevice={currentConnection.source}
         targetDevice={currentConnection.target}

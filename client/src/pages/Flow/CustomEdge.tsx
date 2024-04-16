@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   BaseEdge,
   EdgeLabelRenderer,
@@ -8,11 +7,6 @@ import {
 } from 'reactflow';
 
 import './Flow.css';
-
-const onEdgeClick = (evt: any, id: any) => {
-  evt.stopPropagation();
-  alert(`remove ${id}`);
-};
 
 export default function CustomEdge({
   id,

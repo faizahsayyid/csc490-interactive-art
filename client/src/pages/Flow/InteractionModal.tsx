@@ -6,7 +6,10 @@ import axios from "axios";
 interface InteractionModalProps {
   showModal: boolean;
   onHide: () => void;
-  onConfirm: () => void;
+  onConfirm: (sourceDevice: Node,
+    targetDevice: Node,
+    action_key: string,
+    args: any[]) => void;
   sourceDevice: any;
   targetDevice: any;
 }
@@ -77,6 +80,15 @@ const InteractionModal: React.FC<InteractionModalProps> = ({
     }));
   };
 
+  const handleConfirm = () => {
+    if (selectedAction !== "[select]") {
+      const args = Object.keys(actionParameters).map(key => parameterValues[key]);
+      onConfirm(sourceDevice, targetDevice, selectedAction, args);
+    } else {
+      alert("Select an interaction before confirming.");
+    }
+  };
+
   return (
     <Modal show={showModal} onHide={onHide} centered>
       <Modal.Header closeButton>
@@ -115,7 +127,10 @@ const InteractionModal: React.FC<InteractionModalProps> = ({
         </Form>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="primary" onClick={onConfirm}>
+        <Button variant="secondary" onClick={onHide}>
+          Close
+        </Button>
+        <Button variant="primary" onClick={handleConfirm}>
           Confirm
         </Button>
       </Modal.Footer>
