@@ -57,7 +57,7 @@ interface InteractionFlow {
   sourceDevice: Node;
   targetDevice: Node;
   action: ActionVariable;
-  args: any[];
+  args: Record<string, any>;
 }
 
 export const Flow: React.FC = () => {
@@ -230,7 +230,7 @@ export const Flow: React.FC = () => {
     sourceDevice: any,
     targetDevice: any,
     action: ActionVariable,
-    args: any[]
+    args: Record<string, any>
   ) => {
     setInteractions([
       ...interactions,
@@ -331,3 +331,5 @@ export const Flow: React.FC = () => {
     </div>
   );
 };
+
+export type { InteractionFlow };

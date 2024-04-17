@@ -12,7 +12,7 @@ interface InteractionModalProps {
     sourceDevice: Node,
     targetDevice: Node,
     action: ActionVariable,
-    args: any[]
+    args: Record<string, any>
   ) => void;
   id: string | null;
   sourceDevice: any;
@@ -101,11 +101,9 @@ const InteractionModal: React.FC<InteractionModalProps> = ({
 
   const handleConfirm = () => {
     if (selectedAction.name !== "[select]") {
-      const args = Object.keys(actionParameters).map(
-        (key) => parameterValues[key]
-      );
+      console.log("Args:", parameterValues);
       if (id) {
-        onConfirm(id, sourceDevice, targetDevice, selectedAction, args);
+        onConfirm(id, sourceDevice, targetDevice, selectedAction, parameterValues);
       } else {
         alert("Error: Interaction ID not provided.");
       }
