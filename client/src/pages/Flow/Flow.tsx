@@ -30,7 +30,15 @@ import { InputDevice } from "../../types/device/input-device";
 import { OutputDevice } from "../../types/device/output-device";
 import { v4 as uuidv4 } from "uuid";
 import { ActionVariable } from "../../types/action";
-// import { Project } from "../../types/project";
+import { Project } from "../../types/project";
+import { DeviceConfig } from "../../types/project";
+import { Interaction } from "../../types/project";
+import {
+  InteractionFlowToInteraction,
+  InputNodeToInputDevice,
+  OutputNodeToOutputDevice,
+} from "./utils";
+
 // import axios from "axios";
 
 const start_y = 200;
@@ -65,14 +73,14 @@ export const Flow: React.FC = () => {
   const project_example =
     EXAMPLE_PROJECTS[projectId ? parseInt(projectId) ?? 0 : 0];
 
-  // const [project, setProject] = useState<Project>({
-  //   id: projectId ?? "default-project-id",
-  //   name: project_example.name,
-  //   inputDevices: [],
-  //   outputDevices: [],
-  //   interactions: [],
-  //   lastModified: new Date(),
-  // });
+  const [project, setProject] = useState<Project>({
+    id: projectId ?? "default-project-id",
+    name: project_example.name,
+    inputDevices: [],
+    outputDevices: [],
+    interactions: [],
+    lastModified: new Date(),
+  });
 
   const [currentConnection, setCurrentConnection] = useState<CurrentConnection>(
     { id: null, source: null, target: null }
@@ -275,6 +283,31 @@ export const Flow: React.FC = () => {
     },
     [setEdges, nodes, toggleInteractionModal]
   );
+
+  useEffect(() => {
+    let currInputs = nodes.filter((node) => node.data.type === "input");
+    let currOutputs = nodes.filter((node) => node.data.type === "output");
+    let inputDevices: DeviceConfig<InputDevice>[] = currInputs.map((input) =>
+      InputNodeToInputDevice(input)
+    );
+    let outputDevices: DeviceConfig<OutputDevice>[] = currOutputs.map(
+      (output) => OutputNodeToOutputDevice(output)
+    );
+    let projectInteractions: Interaction[] = interactions.map((interaction) =>
+      InteractionFlowToInteraction(interaction)
+    );
+    let lastModified = new Date();
+    let CurrentProject: Project = {
+      id: project.id,
+      name: project.name,
+      inputDevices: inputDevices,
+      outputDevices: outputDevices,
+      interactions: projectInteractions,
+      lastModified: lastModified,
+    };
+    console.log("Current project:", CurrentProject);
+    setProject(CurrentProject);
+  }, [nodes, edges, interactions]);
 
   return (
     <div className="flow-container">
