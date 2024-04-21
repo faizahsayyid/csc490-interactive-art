@@ -127,11 +127,20 @@ export const Flow: React.FC = () => {
 
   const [lastAddedEdge, setLastAddedEdge] = useState<any | null>(null);
 
+  // useEffect(() => {
+  //   if (interactions.length !== edges.length && !currentConnection.id) {
+  //     alert("Error: Interaction count does not match edge count");
+  //   }
+  // }, [interactions, edges]);
+
   useEffect(() => {
-    if (interactions.length !== edges.length && !currentConnection.id) {
-      alert("Error: Interaction count does not match edge count");
-    }
-  }, [interactions, edges]);
+    // Delete interactions with no corresponding edge
+    setInteractions((prevInteractions) =>
+      prevInteractions.filter((interaction) =>
+        edges.some((edge) => edge.id === interaction.id)
+      )
+    );
+  }, [edges]);
 
   useEffect(() => {
     const initialInputDevices = project_example.inputDevices.map(
