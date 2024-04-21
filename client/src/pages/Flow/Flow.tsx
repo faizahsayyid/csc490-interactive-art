@@ -113,6 +113,8 @@ export const Flow: React.FC = () => {
     let outputDevices = nodes.filter((node) => node.data.type === "output");
     console.log("Input devices:", inputDevices);
     console.log("Output devices:", outputDevices);
+    console.log("Interactions:", interactions);
+    console.log("edges:", edges);
     // setProject({
     //   ...project,
     //   inputDevices: inputDevices.map((device) => device.data),
@@ -121,6 +123,7 @@ export const Flow: React.FC = () => {
     //   lastModified: new Date(),
     // });
   }, [nodes, edges, interactions]);
+
 
   const [lastAddedEdge, setLastAddedEdge] = useState<any | null>(null);
 

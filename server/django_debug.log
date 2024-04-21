@@ -1,0 +1,2 @@
+INFO 2024-04-21 03:10:45,253 basehttp "OPTIONS /arduino/actions/ HTTP/1.1" 200 0
+DEBUG 2024-04-21 03:10:45,862 autoreload File /home/joshpuglielli/anaconda3/lib/python3.9/site-packages/django/contrib/sessions/serializers.py first seen with mtime 1677616943.7274456
