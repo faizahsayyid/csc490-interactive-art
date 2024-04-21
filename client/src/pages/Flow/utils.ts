@@ -3,6 +3,7 @@ import { InteractionFlow } from "./Flow";
 import { DeviceConfig } from "../../types/project";
 import { InputDevice } from "../../types/device/input-device";
 import { OutputDevice } from "../../types/device/output-device";
+// import { ActionVariable } from "../../types/action";
 
 // interface InteractionFlow {
 //     id: string; // Same as id of edge
@@ -17,7 +18,8 @@ const NameToEnum = (name: string): any => {
 };
 
 export const InteractionFlowToInteraction = (intFlow: InteractionFlow): Interaction => {
-  let action_key = intFlow.action.name;
+  
+  let action_key = String(intFlow.action);
   let inputDeviceConfig = InputNodeToInputDevice(intFlow.sourceDevice);
   let outputDeviceConfig = OutputNodeToOutputDevice(intFlow.targetDevice);
   let additionalVariables = intFlow.args;
