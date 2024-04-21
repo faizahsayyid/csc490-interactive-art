@@ -3,3 +3,5 @@ venv/
 **/migrations/[^__init__]*.py
 pyproject.toml
 .vscode
+.env
+db.sqlite3

@@ -34,7 +34,8 @@ DEBUG = env.bool('DEBUG', default=True)
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    'interactive-art.onrender.com'
+    'interactive-art-api.onrender.com',
+    'interactive-art.onrender.com',
 ]
 
 
