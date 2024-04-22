@@ -8,15 +8,24 @@ export const Root: React.FC = () => {
   const projectPathRegex = /^\/project\/[^/]+$/;
   const isFullWidth = projectPathRegex.test(location.pathname);
 
+  const isLoggedIn = !!localStorage.getItem("token");
+
+  if (!isLoggedIn && !["/login", "/register"].includes(location.pathname)) {
+    window.location.href = "/login";
+    return null;
+  } else if (
+    isLoggedIn &&
+    ["/login", "/register"].includes(location.pathname)
+  ) {
+    window.location.href = "/";
+    return null;
+  }
+
   return (
     <>
-      <Header />
+      <Header isLoggedIn={isLoggedIn} />
       <main
-        className={`${
-          isFullWidth
-            ? "container-fluid"
-            : "container mt-3 mb-5"
-        }`}
+        className={`${isFullWidth ? "container-fluid" : "container mt-3 mb-5"}`}
       >
         <Outlet />
       </main>
