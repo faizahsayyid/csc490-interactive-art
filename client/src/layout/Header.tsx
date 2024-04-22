@@ -9,7 +9,7 @@ export const Header: React.FC = () => {
           <Link className="navbar-brand" to="/">
             Interactive Art
           </Link>
-          <Link to="/" className="btn btn-secondary">
+          <Link to="/login" className="btn btn-primary">
             Log Out
           </Link>
         </div>

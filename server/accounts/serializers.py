@@ -8,7 +8,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'email', 'first_name', 'last_name', 'password']
         extra_kwargs = {
             'id': {'read_only': True}, # This is to prevent the user from changing their id
-            'username': {'read_only': True}, # This is to prevent the user from changing their username
+            'username': {}, # This is to prevent the user from changing their username
             'email': {'required': False}, # This is to make the email field not required
             'password': {'write_only': True}, # This is to make the password field not visible
             'first_name': {'required': False}, # This is to make the first name field not required
@@ -31,11 +31,6 @@ class UserSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
     
-    def validate(self, data):
-        if not data.get('username'):
-            raise serializers.ValidationError('You must provide username')
-        return data
-    
     def validate_username(self, value):
         if User.objects.filter(username=value).exists():
             raise serializers.ValidationError('Username already exists')
@@ -47,7 +42,29 @@ class UserSerializer(serializers.ModelSerializer):
         return value
     
     def validate_email(self, value):
+        if value == '':
+            return value
         if User.objects.filter(email=value).exists():
             raise serializers.ValidationError('Email already exists')
         return value
+
+    def validate(self, data):
+        # data is in this format: OrderedDict([('email', ''), ('first_name', ''), ('last_name', ''), ('password', 'Password123!')])
+        # This is to check if the user has provided username
+        # Somehow the username field is not in the ordered dict data
+        # # required fields
+        # if not data.get('username'):
+        #     raise serializers.ValidationError('Username is required')
+        # if not data.get('password'):
+        #     raise serializers.ValidationError('Password is required')
+        # override the super validate
+
+        if self.validate_password(data.get('password')):
+            raise serializers.ValidationError('Password must be at least 8 characters long')
+        if self.validate_username(data.get('username')):
+            raise serializers.ValidationError('Username already exists')
+        if self.validate_email(data.get('email')):
+            raise serializers.ValidationError('Email already exists')
+        # validate other fields if exists
+        return super().validate(data)
     
