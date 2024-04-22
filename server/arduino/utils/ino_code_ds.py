@@ -3,8 +3,9 @@ import subprocess
 import os
 import serial
 import serial.tools.list_ports
-from .actions import Actions
-
+from actions import Actions
+# /home/joshpuglielli/Desktop/capstone/csc490-interactive-art/server/arduino/utils/dummy/dummy.ino
+# /home/joshpuglielli/Desktop/capstone/csc490-interactive-art/server/arduino/utils/dummy.ino
 
 class OutputDevice:
     def __init__(self, pin: int, input_device=None):
@@ -65,37 +66,33 @@ class inoCodeDataStructure:
         globals = "\n".join(self.globals)
 
         return f"""
-                {globals}
+{globals}
 
-                void setup() {{
-                {setup_code}
-                }}
+void setup() {{
+{setup_code}
+}}
 
-                void loop() {{
-                {loop_code}
-                }}
-                """
+void loop() {{
+{loop_code}
+}}
+"""
 
     def __find_port(self):
         """
-        Searches ports for a CH340 device
+        Searches ports for devices typically used with Arduino (e.g., "CH340", "Arduino").
 
-        :return: Port of the CH340 device
+        :return: Detected port device path, or a default one if not found
         """
-        # TODO: make sure this works
         ports = serial.tools.list_ports.comports()
-        path = "server/arduino/utils/dummy.ino"
+        target_descriptors = ["CH340", "Arduino", "USB Serial"]  # Common identifiers for Arduino boards
         for port in ports:
-            # temporary fix; the attribute is not found
-            # board_type = self.board_type
-            board_type = "arduino:avr:nano"
-            if self.__upload_sketch(path, board_type, port.device):
-                print(f"Found port: {port.device}")
+            print(f"Checking port: {port.device} with description '{port.description}'")
+            if any(descriptor in port.description for descriptor in target_descriptors):
+                print(f"Arduino found on port: {port.device}")
                 return port.device
-        print("No port found")
-        return '/dev/cu.usbserial-10'
-        # print("No CH340 device found")
-        # return None
+        
+        print("No Arduino-compatible device found. Please connect your device.")
+        return None
 
     def __write_code_to_file(self, code: str, file_name: str):
         """
@@ -261,9 +258,9 @@ class inoCodeDataStructure:
             self.loop.extend(loop_code)
 
 
-# code = inoCodeDataStructure()
+code = inoCodeDataStructure()
 # Any argument passed that is beyond the action string is passed as *args to the action function,
 # and is determined by the function header in actions.py
-# code.initialize_new_device_connection([13], 11, "negate_output_on_input", 1000)
-# print(code)
+code.initialize_new_device_connection(11, [13], "negate_output_on_input", 1000)
+print(code)
 # code.upload()
