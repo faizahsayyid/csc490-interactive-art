@@ -7,11 +7,14 @@ type User = {
 };
 
 export const login = async ({ email, password }: User): Promise<void> => {
-  await axios.post(`${API_URL}/accounts/login/`, {
+  console.log("logging in");
+  const data = await axios.post(`${API_URL}/accounts/login/`, {
     username: email,
     email,
     password,
   });
+
+  console.log("data_access", data);
 
   // @ts-expect-error - access is in the response
   localStorage.setItem("token", data.access);
