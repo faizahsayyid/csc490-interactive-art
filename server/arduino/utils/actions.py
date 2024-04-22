@@ -15,6 +15,7 @@ class Actions:
             "blink_on_double_click": self.__blink_on_double_click,
             "fade_in_out": self.__fade_in_out,
             "blink": self.__blink,
+            "led_strip_on_input_activation": self.__led_strip_on_input_activation,
         }
 
         # TODO: Make sure all actions make sense
@@ -26,6 +27,7 @@ class Actions:
                 "negate_output_on_hold",
                 "blink_on_hold",
                 "blink_on_double_click",
+                "led_strip_on_input_activation",
             ],
             "light_sensor": [
                 "negate_output_on_input",
@@ -34,6 +36,7 @@ class Actions:
                 "negate_output_on_hold",
                 "blink_on_hold",
                 "blink_on_double_click",
+                "led_strip_on_input_activation",
             ],
             "audio_sensor": [
                 "negate_output_on_input",
@@ -42,6 +45,7 @@ class Actions:
                 "negate_output_on_hold",
                 "blink_on_hold",
                 "blink_on_double_click",
+                "led_strip_on_input_activation",
             ],
             "motion_sensor": [
                 "negate_output_on_input",
@@ -50,7 +54,7 @@ class Actions:
                 "negate_output_on_hold",
                 "blink_on_hold",
                 "blink_on_double_click",
-                "motion_sensor_to_led_strip",
+                "led_strip_on_input_activation",
             ],
         }
 
@@ -61,9 +65,8 @@ class Actions:
                 "no input": ["fade_in_out", "blink"],
             },
             "led_strip": {
-                "input": ["negate_output_on_input",
-                          "motion_sense_to_led_strip"],
-                "no input": ["fade_in_out", "blink"],
+                "input": ["motion_sense_to_led_strip"],
+                "no input": [],
             },
             "speaker": [],
             "motor": [],
@@ -396,7 +399,7 @@ class Actions:
     
 
     # MOTION SENSOR -> LED STRIP
-    def __motion_sensor_to_led_strip(self, input_pin: int, output_pin: int, color: str="White") -> tuple[list, list, list]:
+    def __led_strip_on_input_activation(self, input_pin: int, output_pin: int, color: str="White") -> tuple[list, list, list]:
         """
         Blinks the output pin for a duration then sets it to after_action status(LOW if not specified)
         when the input pin is double clicked
