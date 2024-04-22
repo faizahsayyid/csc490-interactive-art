@@ -19,7 +19,7 @@ export const login = async ({ email, password }: User): Promise<void> => {
 
 export const logout = async (): Promise<void> => {
   await axios.post(`${API_URL}/accounts/logout/`);
-  localStorage.removeItem("token");
+  localStorage.setItem("token", "");
 };
 
 export const register = async ({ email, password }: User): Promise<void> => {
