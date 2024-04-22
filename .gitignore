@@ -4,3 +4,4 @@ venv/
 pyproject.toml
 .vscode
 .env
+db.sqlite3
