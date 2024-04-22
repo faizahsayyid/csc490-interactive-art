@@ -1,17 +1,17 @@
-import { Action } from "./action";
+// import { Action } from "./action";
 import { InputDevice } from "./device/input-device";
 import { OutputDevice } from "./device/output-device";
 
 export type Interaction = {
-  action: Action;
+  action_key: string;
   inputDeviceConfig: DeviceConfig<InputDevice>;
   outputDeviceConfig: DeviceConfig<OutputDevice>;
-  additionalVariables?: Record<string, string>;
+  additionalVariables?: Record<string, any>;
 };
 
 export type DeviceConfig<T> = {
   device: T;
-  pin?: number;
+  id?: string;
 };
 
 export type Project = {

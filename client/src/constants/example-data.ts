@@ -1,4 +1,4 @@
-import { Action } from "../types/action";
+// import { Action } from "../types/action";
 import { InputDevice } from "../types/device/input-device";
 import { OutputDevice } from "../types/device/output-device";
 import { Project } from "../types/project";
@@ -10,42 +10,42 @@ export const EXAMPLE_PROJECTS: Project[] = [
     inputDevices: [
       {
         device: InputDevice.BUTTON,
-        pin: 11,
+        id: "11",
       },
       {
         device: InputDevice.BUTTON,
-        pin: 12,
+        id: "12",
       },
     ],
     outputDevices: [
       {
         device: OutputDevice.LED,
-        pin: 13,
+        id: "13",
       },
       {
         device: OutputDevice.LED,
-        pin: 9,
+        id: "9",
       },
       {
         device: OutputDevice.LED,
-        pin: 8,
+        id: "8",
       },
     ],
     interactions: [
-      {
-        action: Action.NEGATE_OUTPUT_ON_INPUT,
-        inputDeviceConfig: {
-          device: InputDevice.BUTTON,
-          pin: 11,
-        },
-        outputDeviceConfig: {
-          device: OutputDevice.LED,
-          pin: 13,
-        },
-        additionalVariables: {
-          delay: "1000",
-        },
-      },
+      // {
+      //   action: Action.NEGATE_OUTPUT_ON_INPUT,
+      //   inputDeviceConfig: {
+      //     device: InputDevice.BUTTON,
+      //     id: "11",
+      //   },
+      //   outputDeviceConfig: {
+      //     device: OutputDevice.LED,
+      //     id: "13",
+      //   },
+      //   additionalVariables: {
+      //     delay: "1000",
+      //   },
+      // },
     ],
     lastModified: new Date("2024-03-14"),
   },
