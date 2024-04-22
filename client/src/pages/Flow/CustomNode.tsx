@@ -9,14 +9,16 @@ interface CustomNodeData {
   type: string;
 }
 
-const CustomNode = ({ id, data, isConnectable }: NodeProps<CustomNodeData>) => {
+const CustomNode = ({ id, data, isConnectable }: NodeProps<CustomNodeData> ) => {
   const isInput: boolean = data.type === "input";
 
-  const { setNodes } = useReactFlow();
+  const { setNodes, setEdges } = useReactFlow();
 
   const onDelete = () => {
-    console.log("Deleting node with id: ", id);
     setNodes((prevNodes) => prevNodes.filter((node) => node.id !== id));
+    setEdges((prevEdges) =>
+      prevEdges.filter((edge) => edge.source !== id && edge.target !== id)
+    );
   };
 
   return (

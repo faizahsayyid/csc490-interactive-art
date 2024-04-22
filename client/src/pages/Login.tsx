@@ -11,6 +11,7 @@ export const Login = () => {
     event.preventDefault();
     const email = (event.target as HTMLFormElement).email.value;
     const password = (event.target as HTMLFormElement).password.value;
+    console.log(email, password);
     await loginMutation.mutate({ email, password });
     navigate("/");
   };

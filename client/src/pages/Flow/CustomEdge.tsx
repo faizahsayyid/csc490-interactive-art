@@ -5,8 +5,9 @@ import {
   EdgeLabelRenderer,
   EdgeProps,
   getBezierPath,
-  useReactFlow,
-} from "reactflow";
+  // getSmoothStepPath,
+  // useReactFlow,
+} from 'reactflow';
 
 import "./Flow.css";
 
@@ -25,8 +26,9 @@ export default function CustomEdge({
   targetPosition,
   style = {},
   markerEnd,
-}: EdgeProps) {
-  const { setEdges } = useReactFlow();
+  onDelete, // Accept the onDelete function as a prop
+}: EdgeProps & { onDelete: (id: string) => void }) {
+  // const { setEdges } = useReactFlow();
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
     sourceY,
@@ -37,7 +39,7 @@ export default function CustomEdge({
   });
 
   const onEdgeClick = () => {
-    setEdges((edges) => edges.filter((edge) => edge.id !== id));
+    onDelete(id); 
   };
 
   return (
