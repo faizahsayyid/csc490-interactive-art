@@ -55,7 +55,7 @@ class CreateProject(APIView):
             project_name = data.get("name")
             owner = request.user
             
-            # TODO revert back to required version
+            # # TODO revert back to required version
             if owner.is_anonymous:
                 owner = None
                 
