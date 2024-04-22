@@ -107,18 +107,20 @@ LOGGING = {
         },
     },
     'loggers': {
-        'django': {
+        '': {  # This is the root logger
             'handlers': ['file', 'console'],
             'level': 'DEBUG',
             'propagate': True,
         },
-        'arduino': { 
+        'django.request': {  # Log messages related to the handling of requests
             'handlers': ['file', 'console'],
             'level': 'DEBUG',
-            'propagate': True,
+            'propagate': False,
         },
+        # ... any other logger configuration ...
     },
 }
+
 
 
 # Database

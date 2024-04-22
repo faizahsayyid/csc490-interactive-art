@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import { useNavigate } from "react-router-dom";
 import {
@@ -12,6 +12,7 @@ import {
 } from "../constants/device/output-device";
 import { InputDevice } from "../types/device/input-device";
 import { OutputDevice } from "../types/device/output-device";
+import axios from "axios";
 
 export const CreateProject: React.FC = () => {
   const navigate = useNavigate();
@@ -25,6 +26,7 @@ export const CreateProject: React.FC = () => {
    * @todo Add validation for form fields
    */
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    console.log("submitting form");
     event.preventDefault();
 
     const formData = new FormData(event.currentTarget);
@@ -45,7 +47,21 @@ export const CreateProject: React.FC = () => {
       ...outputDeviceFormData,
     });
 
-    navigate("/project/1");
+    axios
+      .post("http://127.0.0.1:8000/arduino/create-project/", {
+        name: formData.get("projectName"),
+        input_devices: inputDeviceFormData,
+        output_devices: outputDeviceFormData,
+      })
+      .then((response) => {
+        console.log(response);
+        // navigate(`/project/${response.data.id}`);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+
+    // navigate("/project/1");
   };
 
   return (

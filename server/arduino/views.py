@@ -8,9 +8,10 @@ from django.utils.decorators import method_decorator
 from .utils.ino_code_ds import inoCodeDataStructure
 from django.views import View
 from django.contrib.auth.decorators import login_required
-from .models import Project
+from .models import Project, InputDevice, OutputDevice, Interaction
 from .serializers import ProjectSerializer, InputOutputDeviceInputSerializer, ParamsFromActionSerializer
 from .utils.actions import Actions
+from .serializers import ProjectSerializer, InputDeviceSerializer, OutputDeviceSerializer, InteractionSerializer
 
 PYTHON_TO_TS_ACTION_TYPE_MAP = {"int": "number", "bool": "boolean"}
 
@@ -38,6 +39,40 @@ class SendCodeToBoard(APIView):
                 code.initialize_new_device_connection(input_pin, output_pins, action_str, arguments)
             code.upload()
             return Response(status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": str(e)})
+
+
+@method_decorator(csrf_exempt, name="dispatch")
+class CreateProject(APIView):
+    """
+    Create a new project with input and output devices
+    """
+
+    def post(self, request, *args, **kwargs):
+        try:
+            data = request.data
+            project_name = data.get("name")
+            owner = request.user
+            
+            # TODO revert back to required version
+            if owner.is_anonymous:
+                owner = None
+                
+            input_devices = data.get("input_devices", [])
+            output_devices = data.get("output_devices", [])
+
+            project = Project.objects.create(name=project_name, owner=owner)
+
+            for device_name in input_devices:
+                for _ in range(input_devices[device_name]):
+                    InputDevice.objects.create(project=project, device_name=device_name)
+
+            for device_name in output_devices:
+                for _ in range(output_devices[device_name]):
+                    OutputDevice.objects.create(project=project, device_name=device_name)
+
+            return Response(status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": str(e)})
 
