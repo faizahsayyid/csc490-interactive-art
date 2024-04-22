@@ -12,7 +12,7 @@ export const SignUp = () => {
     const email = (event.target as HTMLFormElement).email.value;
     const password = (event.target as HTMLFormElement).password.value;
     await registerMutation.mutate({ email, password });
-    // navigate("/");
+    navigate("/");
   };
 
   return (
