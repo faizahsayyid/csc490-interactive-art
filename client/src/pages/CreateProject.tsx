@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import {
   INPUT_DEVICE_INFO,
   INPUT_DEVICE_IMAGES,
@@ -15,7 +15,7 @@ import { OutputDevice } from "../types/device/output-device";
 import axios from "axios";
 
 export const CreateProject: React.FC = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const getFormValue = (formData: FormData, name: string): number => {
     const value = formData.get(name);

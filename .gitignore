@@ -4,3 +4,5 @@ venv/
 pyproject.toml
 .vscode
 django_debug.log
+.env
+db.sqlite3
