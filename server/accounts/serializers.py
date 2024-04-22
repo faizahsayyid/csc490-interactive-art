@@ -8,7 +8,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'email', 'first_name', 'last_name', 'password']
         extra_kwargs = {
             'id': {'read_only': True}, # This is to prevent the user from changing their id
-            'username': {'read_only': True}, # This is to prevent the user from changing their username
+            # 'username': {'read_only': True}, # This is to prevent the user from changing their username
             'email': {'required': False}, # This is to make the email field not required
             'password': {'write_only': True}, # This is to make the password field not visible
             'first_name': {'required': False}, # This is to make the first name field not required

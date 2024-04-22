@@ -1,7 +1,21 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { logout } from "../api/auth";
+import { useMutation } from "@tanstack/react-query";
 
-export const Header: React.FC = () => {
+type HeaderProps = {
+  isLoggedIn: boolean;
+};
+
+export const Header: React.FC<HeaderProps> = ({ isLoggedIn }) => {
+  const logoutMutation = useMutation({ mutationFn: logout });
+  const navigate = useNavigate();
+
+  const onLogout = () => {
+    logoutMutation.mutate();
+    navigate("/login");
+  };
+
   return (
     <header>
       <nav className="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
@@ -9,9 +23,11 @@ export const Header: React.FC = () => {
           <Link className="navbar-brand" to="/">
             Interactive Art
           </Link>
-          <Link to="/" className="btn btn-secondary">
-            Log Out
-          </Link>
+          {isLoggedIn && (
+            <button className="btn btn-secondary" onClick={onLogout}>
+              Log Out
+            </button>
+          )}
         </div>
       </nav>
     </header>
