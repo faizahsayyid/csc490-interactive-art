@@ -48,10 +48,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'arduino',
     'corsheaders',
     'rest_framework',
     'accounts',
+    'arduino',
 ]
 
 MIDDLEWARE = [
@@ -129,7 +129,6 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': False,
         },
-        # ... any other logger configuration ...
     },
 }
 
