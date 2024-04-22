@@ -46,6 +46,7 @@ class SendCodeToBoard(APIView):
 @method_decorator(csrf_exempt, name="dispatch")
 class CreateProject(APIView):
     """
+    @TODO faizah, correct with whatever you decide
     Create a new project with input and output devices
     """
 
@@ -55,7 +56,7 @@ class CreateProject(APIView):
             project_name = data.get("name")
             owner = request.user
             
-            # # TODO revert back to required version
+            # @TODO revert back to required version
             if owner.is_anonymous:
                 owner = None
                 

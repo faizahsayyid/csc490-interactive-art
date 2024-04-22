@@ -7,7 +7,7 @@ class Project(models.Model):
     """
     A project is a collection of input and output devices that are connected to each other.
     """
-    # TODO revert back to required version 
+    # @TODO revert back to required version 
     owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
     # owner = models.ForeignKey(User, on_delete=models.CASCADE)
