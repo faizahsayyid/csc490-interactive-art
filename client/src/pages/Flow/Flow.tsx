@@ -69,6 +69,7 @@ interface InteractionFlow {
 }
 
 export const Flow: React.FC = () => {
+  // @TODO - Load project state from backend
   const { projectId } = useParams();
   const project_example =
     EXAMPLE_PROJECTS[projectId ? parseInt(projectId) ?? 0 : 0];
@@ -87,8 +88,8 @@ export const Flow: React.FC = () => {
   );
   const [interactions, setInteractions] = useState<InteractionFlow[]>([]);
 
-  const [showDeviceModal, setShowDeviceModal] = useState(false); // State to handle modal visibility
-  const [showInteractionModal, setShowInteractionModal] = useState(false); // State to handle modal visibility
+  const [showDeviceModal, setShowDeviceModal] = useState(false); 
+  const [showInteractionModal, setShowInteractionModal] = useState(false); 
 
   const toggleDeviceModal = () => setShowDeviceModal(!showDeviceModal);
   const toggleInteractionModal = () => {
@@ -143,6 +144,7 @@ export const Flow: React.FC = () => {
   }, [edges]);
 
   useEffect(() => {
+    // @TODO - Load project state from backend, modify loading logic
     const initialInputDevices = project_example.inputDevices.map(
       (inputDevice, index) => ({
         id: uuidv4(),
@@ -297,6 +299,7 @@ export const Flow: React.FC = () => {
   );
 
   useEffect(() => {
+    // @TODO - Save modified project state to backend
     let currInputs = nodes.filter((node) => node.data.type === "input");
     let currOutputs = nodes.filter((node) => node.data.type === "output");
     let inputDevices: DeviceConfig<InputDevice>[] = currInputs.map((input) =>
