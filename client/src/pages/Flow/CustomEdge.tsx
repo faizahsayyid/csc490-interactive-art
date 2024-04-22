@@ -1,3 +1,5 @@
+// @ts-expect-error - ignore react import error
+import React from "react";
 import {
   BaseEdge,
   EdgeLabelRenderer,
@@ -7,7 +9,12 @@ import {
   // useReactFlow,
 } from 'reactflow';
 
-import './Flow.css';
+import "./Flow.css";
+
+// const onEdgeClick = (evt: any, id: any) => {
+//   evt.stopPropagation();
+//   alert(`remove ${id}`);
+// };
 
 export default function CustomEdge({
   id,
@@ -41,12 +48,12 @@ export default function CustomEdge({
       <EdgeLabelRenderer>
         <div
           style={{
-            position: 'absolute',
+            position: "absolute",
             transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
             fontSize: 12,
             // everything inside EdgeLabelRenderer has no pointer events by default
             // if you have an interactive element, set pointer-events: all
-            pointerEvents: 'all',
+            pointerEvents: "all",
           }}
           className="nodrag nopan"
         >
