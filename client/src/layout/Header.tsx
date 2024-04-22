@@ -23,6 +23,12 @@ export const Header: React.FC<HeaderProps> = ({ isLoggedIn }) => {
           <Link className="navbar-brand" to="/">
             Interactive Art
           </Link>
+          <Link
+            className="ms-auto nav-item navbar-link text-light me-3"
+            to="/help"
+          >
+            Help
+          </Link>
           {isLoggedIn && (
             <button className="btn btn-secondary" onClick={onLogout}>
               Log Out
