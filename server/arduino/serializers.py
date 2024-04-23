@@ -61,3 +61,22 @@ class ProjectSerializer(serializers.ModelSerializer):
             Interaction.objects.create(project=project, **interaction_data)
 
         return project
+
+class DeviceConnectionSerializer(serializers.Serializer):
+    input_pin = serializers.IntegerField(required=False, allow_null=True)
+    output_pins = serializers.ListField(
+        child=serializers.IntegerField(), required=True
+    )
+    action_str = serializers.CharField(required=True)
+    arguments = serializers.ListField(
+        child=serializers.CharField(), required=False, allow_null=True
+    )
+
+    def validate(self, data):
+        if data.get('input_pin') is not None and not isinstance(data['input_pin'], int):
+            raise serializers.ValidationError("input_pin must be an integer or None.")
+        if not isinstance(data['output_pins'], list) or not all(isinstance(x, int) for x in data['output_pins']):
+            raise serializers.ValidationError("output_pins must be a list of integers.")
+        if not data['output_pins']:
+            raise serializers.ValidationError("output_pins cannot be empty.")
+        return data

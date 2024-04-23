@@ -3,9 +3,7 @@ import subprocess
 import os
 import serial
 import serial.tools.list_ports
-from actions import Actions
-# /home/joshpuglielli/Desktop/capstone/csc490-interactive-art/server/arduino/utils/dummy/dummy.ino
-# /home/joshpuglielli/Desktop/capstone/csc490-interactive-art/server/arduino/utils/dummy.ino
+from arduino.utils.actions import Actions
 
 class OutputDevice:
     def __init__(self, pin: int, input_device=None):
@@ -86,7 +84,6 @@ void loop() {{
         ports = serial.tools.list_ports.comports()
         target_descriptors = ["CH340", "Arduino", "USB Serial"]  # Common identifiers for Arduino boards
         for port in ports:
-            print(f"Checking port: {port.device} with description '{port.description}'")
             if any(descriptor in port.description for descriptor in target_descriptors):
                 print(f"Arduino found on port: {port.device}")
                 return port.device
@@ -258,9 +255,10 @@ void loop() {{
             self.loop.extend(loop_code)
 
 
-code = inoCodeDataStructure()
-# Any argument passed that is beyond the action string is passed as *args to the action function,
-# and is determined by the function header in actions.py
-code.initialize_new_device_connection(11, [13], "negate_output_on_input", 1000)
-print(code)
-# code.upload()
+if __name__ == "__main__":
+    code = inoCodeDataStructure()
+    # Any argument passed that is beyond the action string is passed as *args to the action function,
+    # and is determined by the function header in actions.py
+    code.initialize_new_device_connection(11, [13], "negate_output_on_input", 1000)
+    print(code)
+    # code.upload()

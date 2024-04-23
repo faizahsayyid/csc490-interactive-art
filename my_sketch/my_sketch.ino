@@ -2,17 +2,16 @@
 
 
 void setup() {
-  pinMode(13, INPUT);
-  pinMode(11, OUTPUT);
+  pinMode(11, INPUT);
+  pinMode(13, OUTPUT);
 
 }
 
 void loop() {
-  int inputState = digitalRead(13);
+  int inputState = digitalRead(11);
   if (inputState == HIGH) {
-    int outputState = digitalRead(11);
-    digitalWrite(11, !outputState);
+    int outputState = digitalRead(13);
+    digitalWrite(13, !outputState);
   }
-  delay(50)
 
 }

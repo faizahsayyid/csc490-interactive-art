@@ -20,27 +20,44 @@ PYTHON_TO_TS_ACTION_TYPE_MAP = {"int": "number", "bool": "boolean"}
 class SendCodeToBoard(APIView):
     def post(self, request, *args, **kwargs):
         try:
+            print(request.data)
             code = inoCodeDataStructure()
-            # Data is a list of lists of form: [input_pin: Optional[int], output_pins: List[int], action: str, *args, **kwargs]
+            # Data is a list of lists of form: [input_pin: Optional[int], output_pins: List[int], action: str, *args: list]
             # Each list represents some connection between device (solo output, or input -> output(s))
             data = request.data
-            assert isinstance(data, list) and all(isinstance(x, list) for x in data)
+            if not isinstance(data, list) or not all(isinstance(x, list) for x in data):
+                raise ValueError("Invalid data format: Data must be a list of lists.")
+            
             for connection in data:
+                if len(connection) < 3:
+                    raise ValueError("Each connection must have at least three elements: input_pin, output_pins, and action_str.")
+                
                 input_pin = connection[0]
                 output_pins = connection[1]
                 action_str = connection[2]
                 arguments = connection[3:]
-                assert isinstance(input_pin, int) or input_pin is None
-                assert isinstance(output_pins, list) and all(isinstance(x, int) for x in output_pins)
-                assert isinstance(action_str, str)
-                assert isinstance(args, list)
-
+                
+                if not (isinstance(input_pin, int) or input_pin is None):
+                    raise TypeError("input_pin must be an integer or None.")
+                if not isinstance(output_pins, list) or not all(isinstance(x, int) for x in output_pins):
+                    raise TypeError("output_pins must be a list of integers.")
+                if not isinstance(action_str, str):
+                    raise TypeError("action_str must be a string.")
+                if not isinstance(arguments, list):
+                    raise TypeError("arguments must be a list.")
+                
                 # Initialize the connection between the input and output devices
                 code.initialize_new_device_connection(input_pin, output_pins, action_str, arguments)
-            code.upload()
-            return Response(status=status.HTTP_200_OK)
+
+            try:    
+                code.upload()
+            except Exception as e:
+                return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "Failed to upload code to board.\n\n Code: \n" + str(code) + "\n\nError: " + str(e)})
+            return Response(status=status.HTTP_200_OK, data={"code": str(code)})
+        except AssertionError as ae:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": str(ae)})
         except Exception as e:
-            return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": str(e)})
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data={"error": str(e)})
 
 
 @method_decorator(csrf_exempt, name="dispatch")
