@@ -2,9 +2,21 @@ import React from "react";
 import { ProjectTable } from "../components/project/ProjectTable";
 import { Link } from "react-router-dom";
 import { EXAMPLE_PROJECTS } from "../constants/example-data";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const Home: React.FC = () => {
   const projects = EXAMPLE_PROJECTS;
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!localStorage.getItem("token")) {
+      // console.log("token does not exist, navigating to login page");
+      navigate("/login");
+    } else {
+      // console.log("token exists, staying in Home page");
+    }
+  }, []);
 
   return (
     <>
