@@ -48,6 +48,8 @@ class Login(APIView):
 class Logout(APIView):
     @method_decorator(csrf_exempt)
     def post(self, request):
+        if request.user.is_anonymous:
+            return JsonResponse({'message': 'You are not logged in'}, status=200)
         request.user.auth_token.delete()
         logout(request)
         return JsonResponse({'message': 'Logout successful'}, status=200)
