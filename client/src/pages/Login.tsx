@@ -1,19 +1,55 @@
 import React from "react";
-import { login } from "../api/auth";
-import { useMutation } from "@tanstack/react-query";
+// import { login } from "../api/auth";
+// import { useMutation } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { API_URL } from "../api/config";
 
 export const Login = () => {
-  const loginMutation = useMutation({ mutationFn: login });
   const navigate = useNavigate();
+
+  useEffect(() => {
+    console.log("Entering login page");
+    if (localStorage.getItem("token")) {
+      console.log("token exists, navigating to /");
+      navigate("/");
+    }
+  }, []);
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const email = (event.target as HTMLFormElement).email.value;
     const password = (event.target as HTMLFormElement).password.value;
-    console.log(email, password);
-    await loginMutation.mutate({ email, password });
-    navigate("/");
+
+    try {
+      const response = await fetch(`${API_URL}/accounts/login/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: email,
+          password,
+        }),
+      });
+  
+      const data = await response.json();
+  
+      if (response.status === 400) {
+        console.log("error", data);
+        alert(data["message"]);
+        return;
+  
+      } else {
+        console.log(data);
+        localStorage.setItem("token", data.access);
+        return;
+      }
+  
+    } catch (error) {
+      console.error("error", error);
+      return;
+    }
   };
 
   return (

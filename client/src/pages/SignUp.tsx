@@ -1,18 +1,75 @@
-import React from "react";
-import { register } from "../api/auth";
-import { useMutation } from "@tanstack/react-query";
+import React, { useEffect } from "react";
+import { API_URL } from "../api/config";
+// import { useMutation } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 export const SignUp = () => {
-  const registerMutation = useMutation({ mutationFn: register });
   const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // Update isLoggedIn state
+  useEffect(() => {
+    console.log("Entering login page");
+    if (localStorage.getItem("token")) {
+      console.log("token exists, will go from signup to /");
+      setIsLoggedIn(true);
+    } else {
+      console.log("token does not exist, will stay in signup page");
+      setIsLoggedIn(false);
+    }
+  }
+  , []);
+
+  // Redirect to home page if logged in
+  useEffect(() => {
+    if (isLoggedIn) {
+      console.log("token exists, navigating to /");
+      navigate("/");
+    }
+  }
+  , [isLoggedIn]);
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const email = (event.target as HTMLFormElement).email.value;
     const password = (event.target as HTMLFormElement).password.value;
-    await registerMutation.mutate({ email, password });
-    navigate("/");
+    // Call register function from api/auth.ts
+    try {
+      const response = await fetch(`${API_URL}/accounts/register/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: email,
+          email,
+          password,
+        }),
+      });
+  
+      const data = await response.json();
+  
+      if (response.status === 400) {
+        console.log("error", data);
+        if (data.username) {
+          alert(`Email: ${data["username"]}`);
+        }
+        if (data.password) {
+          alert(`Password: ${data["password"]}`);
+        }
+        return;
+      } else {
+        console.log("register successful");
+        localStorage.setItem("token", data.access);
+        setIsLoggedIn(true);
+        return;
+      }
+  
+    } catch (error) {
+      console.error("error", error);
+      return;
+    }
   };
 
   return (
