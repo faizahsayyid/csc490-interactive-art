@@ -414,35 +414,31 @@ class Actions:
         NUM_LEDS = 60
         CHIPSET = "WS2812B"
         COLOR_ORDER = "GRB"
-        # BRIGHTNESS = 255
 
-        on_color = f"CRGB::{color}"
+        on_color = f"CRGB::White"
         black = "CRGB::Black"
 
         # helper function
         def setStripColor(color):
-            return [{f"for(int i = 0; i < NUM_LEDS; i++)": [f"leds[i] = {color};"]}, "FastLED.show();", "delay(500);"]
+            return [{f"for(int i = 0; i < {NUM_LEDS}; i++)": [f"leds[i] = {color};"]}, "FastLED.show();", "delay(500);"]
 
         return (
             # global_code
-            ["#include <FastLED.h>", "CRGB leds[NUM_LEDS];"],
+            ["#include <FastLED.h>", f"CRGB leds[{NUM_LEDS}];"],
             # setup_code
             [
-                f"FastLED.addLeds<CHIPSET, {output_pin}, COLOR_ORDER>(leds, NUM_LEDS);",
-                f"pinMode({input_pin}, INPUT);",
+                f"FastLED.addLeds<{CHIPSET}, {output_pin}, {COLOR_ORDER}>(leds, {NUM_LEDS});",
+                "Serial.begin(9600);"
             ],
             # loop_code
             [
                 f"int inputState = digitalRead({input_pin});",
                 {
-                    "if (inputState == HIGH)": [
-                        setStripColor(on_color),
-                    ]
+                    "if (inputState == HIGH)": setStripColor(on_color),
+                    
                 },
                 {
-                    "else": [
-                        setStripColor(black),
-                    ]
+                    "else": setStripColor(black),
                 },
             ],
         )
