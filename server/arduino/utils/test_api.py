@@ -11,3 +11,9 @@ data = [[8, [4], "led_strip_on_input_activation"]]
 
 response = requests.post(url, headers=headers, json=data)
 print(response.json())
+print("\n")
+
+try:
+    print(response.json()["code"])
+except:
+    pass
