@@ -1,6 +1,7 @@
 import inspect
 from typing import Dict, Optional, Type, Union, List
 
+
 class Actions:
     def __init__(self):
         # REQUIRED: All methods must return a tuple with len 3 as follows: (global_code: list, setup_code: list, loop_code: list)
@@ -396,10 +397,9 @@ class Actions:
                 },
             ],
         )
-    
 
     # MOTION SENSOR -> LED STRIP
-    def __led_strip_on_input_activation(self, input_pin: int, output_pin: int, color: str="White") -> tuple[list, list, list]:
+    def __led_strip_on_input_activation(self, input_pin: int, output_pin: int, color: str = "White") -> tuple[list, list, list]:
         """
         Blinks the output pin for a duration then sets it to after_action status(LOW if not specified)
         when the input pin is double clicked
@@ -411,7 +411,6 @@ class Actions:
         input_pin = str(input_pin)
         output_pin = str(output_pin)
 
-
         NUM_LEDS = 60
         CHIPSET = "WS2812B"
         COLOR_ORDER = "GRB"
@@ -422,22 +421,11 @@ class Actions:
 
         # helper function
         def setStripColor(color):
-            return [
-                {
-                    f"for(int i = 0; i < NUM_LEDS; i++)": [
-                        f"leds[i] = {color};"
-                    ]
-                },
-                "FastLED.show();",
-                "delay(500);"
-                ]
+            return [{f"for(int i = 0; i < NUM_LEDS; i++)": [f"leds[i] = {color};"]}, "FastLED.show();", "delay(500);"]
 
         return (
             # global_code
-            [
-                "#include <FastLED.h>",
-                "CRGB leds[NUM_LEDS];"
-            ],
+            ["#include <FastLED.h>", "CRGB leds[NUM_LEDS];"],
             # setup_code
             [
                 f"FastLED.addLeds<CHIPSET, {output_pin}, COLOR_ORDER>(leds, NUM_LEDS);",
@@ -446,15 +434,16 @@ class Actions:
             # loop_code
             [
                 f"int inputState = digitalRead({input_pin});",
-
                 {
                     "if (inputState == HIGH)": [
                         setStripColor(on_color),
-                    ],
+                    ]
+                },
+                {
                     "else": [
                         setStripColor(black),
                     ]
-                }
+                },
             ],
         )
 
@@ -490,7 +479,7 @@ class Actions:
             allowed_output_actions = set(self.output_device_actions[output_device]["input"])
             allowed_input_actions = set(self.input_device_actions[input_device])
             return list(allowed_output_actions.intersection(allowed_input_actions))
-    
+
     def get_arg_list_for_action(self, action_key: str) -> Dict[str, Optional[Type]]:
         """
         Method to get the dictionary of arguments and their types for a specific action.
@@ -499,20 +488,20 @@ class Actions:
         :return: Dictionary where keys are argument names and values are their types
         """
         assert action_key in self.actions.keys(), f"Invalid action key: {action_key}"
-        
+
         # Fetch the signature of the function mapped to the action_key
         func = self.actions[action_key]
         signature = inspect.signature(func)
-        
+
         # Extract parameter names and types
         parameters = signature.parameters  # This is an OrderedDict of name: Parameter objects
         arg_types = {}
         for name, param in parameters.items():
             # Exclude 'self' if it's a method of a class
-            if name == 'self':
+            if name == "self":
                 continue
             # The annotation is inspect._empty if not specified; you can handle it as None or any other way
             type_hint = param.annotation if param.annotation != inspect.Parameter.empty else None
             arg_types[name] = type_hint
-        
+
         return arg_types

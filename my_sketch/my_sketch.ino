@@ -1,17 +1,20 @@
 
-
+#include <FastLED.h>
+CRGB leds[NUM_LEDS];
 
 void setup() {
-  pinMode(11, INPUT);
-  pinMode(13, OUTPUT);
+  pinMode(8, INPUT);
+  pinMode(4, OUTPUT);
+  FastLED.addLeds<CHIPSET, 4, COLOR_ORDER>(leds, NUM_LEDS);
+  pinMode(8, INPUT);
 
 }
 
 void loop() {
-  int inputState = digitalRead(11);
+  int inputState = digitalRead(8);
   if (inputState == HIGH) {
-    int outputState = digitalRead(13);
-    digitalWrite(13, !outputState);
+  }
+  else {
   }
 
 }
