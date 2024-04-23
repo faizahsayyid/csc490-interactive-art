@@ -26,11 +26,11 @@ class SendCodeToBoard(APIView):
             # Each list represents some connection between device (solo output, or input -> output(s))
             data = request.data
             if not isinstance(data, list) or not all(isinstance(x, list) for x in data):
-                raise ValueError("Invalid data format: Data must be a list of lists.")
+                return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "Data must be a list of lists."})
             
             for connection in data:
                 if len(connection) < 3:
-                    raise ValueError("Each connection must have at least three elements: input_pin, output_pins, and action_str.")
+                    return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "Each connection must have at least 3 elements."})
                 
                 input_pin = connection[0]
                 output_pins = connection[1]
@@ -38,13 +38,13 @@ class SendCodeToBoard(APIView):
                 arguments = connection[3:]
                 
                 if not (isinstance(input_pin, int) or input_pin is None):
-                    raise TypeError("input_pin must be an integer or None.")
+                    return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "input_pin must be an integer or None."})
                 if not isinstance(output_pins, list) or not all(isinstance(x, int) for x in output_pins):
-                    raise TypeError("output_pins must be a list of integers.")
+                    return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "output_pins must be a list of integers."})
                 if not isinstance(action_str, str):
-                    raise TypeError("action_str must be a string.")
+                    return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "action must be a string."})
                 if not isinstance(arguments, list):
-                    raise TypeError("arguments must be a list.")
+                    return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "arguments must be a list."})
                 
                 # Initialize the connection between the input and output devices
                 code.initialize_new_device_connection(input_pin, output_pins, action_str, arguments)
