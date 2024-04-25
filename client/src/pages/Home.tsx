@@ -17,6 +17,8 @@ export const Home: React.FC = () => {
   }
   , []);
 
+  console.log("token: ", localStorage.getItem("token"));
+
   return (
     <>
       <div className="d-flex justify-content-between my-5 ms-2">

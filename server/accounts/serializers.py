@@ -1,18 +1,16 @@
 # from .models import Profile
 from rest_framework import serializers
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'password']
+        fields = ['id', 'email', 'password']
         extra_kwargs = {
             'id': {'read_only': True}, # This is to prevent the user from changing their id
-            # 'username': {'read_only': True}, # This is to prevent the user from changing their username
             'email': {'required': True}, # This is to make the email field not required
             'password': {'write_only': True}, # This is to make the password field not visible
-            'first_name': {'required': False}, # This is to make the first name field not required
-            'last_name': {'required': False}, # This is to make the last name field not required
         }
 
     def create(self, validated_data):
@@ -51,3 +49,31 @@ class UserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Email already exists')
         return value
     
+class RegisterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ( 'email','username',  'password')
+        extra_kwargs = {'password': {'write_only': True}}
+
+    def create(self, validated_data):
+        user = User.objects.create_user(
+            validated_data['email'],
+            validated_data['username'],
+            validated_data['password'],
+        )
+
+        return user
+
+
+class LoginUserSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    password = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        user = authenticate(username=data['email'], password=data['password'])  # email as username
+        if user and user.is_active:
+            return user
+        raise serializers.ValidationError("Unable to log in with provided credentials.")
+    
+class LogoutUserSerializer(serializers.Serializer):
+    pass

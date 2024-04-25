@@ -9,7 +9,7 @@ import ReactFlow, {
   useEdgesState,
 } from "reactflow";
 import { EXAMPLE_PROJECTS } from "../../constants/example-data";
-import { useParams } from "react-router-dom";
+// import { useParams } from "react-router-dom";
 import {
   INPUT_DEVICE_INFO,
   INPUT_DEVICE_IMAGES,
@@ -38,6 +38,8 @@ import {
   InputNodeToInputDevice,
   OutputNodeToOutputDevice,
 } from "./utils";
+import axios from "axios";
+import { API_URL } from "../../api/config";
 
 // import axios from "axios";
 
@@ -70,18 +72,30 @@ interface InteractionFlow {
 
 export const Flow: React.FC = () => {
   // @TODO - Load project state from backend
-  const { projectId } = useParams();
-  const project_example =
-    EXAMPLE_PROJECTS[projectId ? parseInt(projectId) ?? 0 : 0];
+  // const { projectId } = useParams();
 
-  const [project, setProject] = useState<Project>({
-    id: projectId ?? "default-project-id",
-    name: project_example.name,
-    inputDevices: [],
-    outputDevices: [],
-    interactions: [],
-    lastModified: new Date(),
-  });
+  // @JoshPugli change this to the actual project id
+  const projectId: string = "1";
+
+  const [project, setProject] = useState<Project | null>(null);
+
+  const fetchProject = async (projectId: string) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8000/arduino/projects/${projectId}`
+      );
+      console.log("Fetched project:", response.data);
+      setProject(response.data);
+    } catch (error) {
+      console.error("Failed to fetch project:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (projectId) {
+      fetchProject(projectId);
+    }
+  }, [projectId]);
 
   const [currentConnection, setCurrentConnection] = useState<CurrentConnection>(
     { id: null, source: null, target: null }
@@ -109,21 +123,40 @@ export const Flow: React.FC = () => {
     console.error("Error: Incorrect number of input and output devices");
   }
 
-  useEffect(() => {
-    let inputDevices = nodes.filter((node) => node.data.type === "input");
-    let outputDevices = nodes.filter((node) => node.data.type === "output");
-    console.log("Input devices:", inputDevices);
-    console.log("Output devices:", outputDevices);
-    console.log("Interactions:", interactions);
-    console.log("edges:", edges);
-    // setProject({
-    //   ...project,
-    //   inputDevices: inputDevices.map((device) => device.data),
-    //   outputDevices: outputDevices.map((device) => device.data),
-    //   interactions: interactions,
-    //   lastModified: new Date(),
-    // });
-  }, [nodes, edges, interactions]);
+  // useEffect(() => {
+  //   // @TODO - Load project state from backend, modify loading logic
+  //   const initialInputDevices = project_example.inputDevices.map(
+  //     (inputDevice, index) => ({
+  //       id: uuidv4(),
+  //       type: "custom",
+  //       data: {
+  //         label: INPUT_DEVICE_INFO[inputDevice.device].name,
+  //         name: INPUT_DEVICE_INFO[inputDevice.device].name,
+  //         image: INPUT_DEVICE_IMAGES[inputDevice.device],
+  //         description: INPUT_DEVICE_INFO[inputDevice.device].description,
+  //         type: "input",
+  //       },
+  //       position: { x: input_x, y: start_y + y_step * index },
+  //     })
+  //   );
+
+  //   const initialOutputDevices = project_example.outputDevices.map(
+  //     (outputDevice, index) => ({
+  //       id: uuidv4(),
+  //       type: "custom",
+  //       data: {
+  //         label: OUTPUT_DEVICE_INFO[outputDevice.device].name,
+  //         name: OUTPUT_DEVICE_INFO[outputDevice.device].name,
+  //         image: OUTPUT_DEVICE_IMAGES[outputDevice.device],
+  //         description: OUTPUT_DEVICE_INFO[outputDevice.device].description,
+  //         type: "output",
+  //       },
+  //       position: { x: output_x, y: start_y + y_step * index },
+  //     })
+  //   );
+
+  //   setNodes([...initialInputDevices, ...initialOutputDevices]);
+  // }, []);
 
   const [lastAddedEdge, setLastAddedEdge] = useState<any | null>(null);
 
@@ -141,41 +174,6 @@ export const Flow: React.FC = () => {
       )
     );
   }, [edges]);
-
-  useEffect(() => {
-    // @TODO - Load project state from backend, modify loading logic
-    const initialInputDevices = project_example.inputDevices.map(
-      (inputDevice, index) => ({
-        id: uuidv4(),
-        type: "custom",
-        data: {
-          label: INPUT_DEVICE_INFO[inputDevice.device].name,
-          name: INPUT_DEVICE_INFO[inputDevice.device].name,
-          image: INPUT_DEVICE_IMAGES[inputDevice.device],
-          description: INPUT_DEVICE_INFO[inputDevice.device].description,
-          type: "input",
-        },
-        position: { x: input_x, y: start_y + y_step * index },
-      })
-    );
-
-    const initialOutputDevices = project_example.outputDevices.map(
-      (outputDevice, index) => ({
-        id: uuidv4(),
-        type: "custom",
-        data: {
-          label: OUTPUT_DEVICE_INFO[outputDevice.device].name,
-          name: OUTPUT_DEVICE_INFO[outputDevice.device].name,
-          image: OUTPUT_DEVICE_IMAGES[outputDevice.device],
-          description: OUTPUT_DEVICE_INFO[outputDevice.device].description,
-          type: "output",
-        },
-        position: { x: output_x, y: start_y + y_step * index },
-      })
-    );
-
-    setNodes([...initialInputDevices, ...initialOutputDevices]);
-  }, []);
 
   useEffect(() => {
     const updateSize = () => {
@@ -298,6 +296,10 @@ export const Flow: React.FC = () => {
   );
 
   useEffect(() => {
+    if (!project) {
+      return;
+    }
+
     // @TODO - Save modified project state to backend
     let currInputs = nodes.filter((node) => node.data.type === "input");
     let currOutputs = nodes.filter((node) => node.data.type === "output");
@@ -332,7 +334,7 @@ export const Flow: React.FC = () => {
               <Link to="/">Projects</Link>
             </li>
             <li className="breadcrumb-item active" aria-current="page">
-              {project_example.name}
+              {project && project.name}
             </li>
           </ol>
         </nav>
