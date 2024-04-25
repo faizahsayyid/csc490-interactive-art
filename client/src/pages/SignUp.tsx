@@ -1,49 +1,22 @@
-import { API_URL } from "../api/config";
-// import { useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
+import { register } from "../api/auth";
 import { Link } from "react-router-dom";
 
 export const SignUp = () => {
+  const registerMutation = useMutation({ mutationFn: register });
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const email = (event.target as HTMLFormElement).email.value;
     const password = (event.target as HTMLFormElement).password.value;
-    // Call register function from api/auth.ts
-    try {
-      const response = await fetch(`${API_URL}/accounts/register/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: email,
-          email,
-          password,
-        }),
-      });
-  
-      const data = await response.json();
-  
-      if (response.status === 400) {
-        console.log("error", data);
-        if (data.username) {
-          alert(`Email: ${data["username"]}`);
-        }
-        if (data.password) {
-          alert(`Password: ${data["password"]}`);
-        }
-        return;
-      } else {
-        console.log("register successful");
-        localStorage.setItem("token", data.access);
-        return;
-      }
-  
-    } catch (error) {
-      console.error("error", error);
+    var confirmPassword = (event.target as HTMLFormElement).confirmPassword.value;
+    if (password !== confirmPassword) {
+      // This is checked directly as otherwise we have to force confirmPassword to be part of User type for the mutation function to work
+      alert("Passwords do not match");
       return;
     }
-  };
+    registerMutation.mutate({email, password});
+  }
 
   return (
     <form
