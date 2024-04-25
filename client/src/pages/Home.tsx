@@ -1,10 +1,50 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ProjectTable } from "../components/project/ProjectTable";
 import { Link } from "react-router-dom";
-import { EXAMPLE_PROJECTS } from "../constants/example-data";
+import { Project } from "../types/project";
+import axios from "axios";
+import { API_URL } from "../api/config";
 
 export const Home: React.FC = () => {
-  const projects = EXAMPLE_PROJECTS;
+  const [projects, setProjects] = useState<Project[]>([]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const getProjects = async () => {
+        const response = await axios.get(`${API_URL}/arduino/projects/`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await response.data;
+        if (response.status !== 200) {
+          console.log(data["error"]);
+          return [];
+        }
+        setProjects(data);
+      };
+      getProjects();
+    }
+  }
+  , []);
+
+  // useEffect(() => {
+  //   const token = localStorage.getItem("token");
+  //   if (token) {
+  //     // Fetch projects when the component mounts
+  //     getProjectsMutation.mutate({ token });
+  //   }
+  // }, []);
+  
+  // // React to mutation status
+  // useEffect(() => {
+  //   if (getProjectsMutation.isSuccess) {
+  //     // Update the state with the fetched projects
+  //     setProjects(getProjectsMutation.data || []);
+  //   }
+  // }, [getProjectsMutation.isSuccess, getProjectsMutation.data]);
+
 
   return (
     <>
