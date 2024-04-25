@@ -51,7 +51,7 @@ class SendCodeToBoard(APIView):
             try:    
                 code.upload()
             except Exception as e:
-                return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "Failed to upload code to board.", "code": str(code), "Error": str(e)})
+                return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": f"Failed to upload code to board.\ncode: {str(code)}\nError:{str(e)}"})
             return Response(status=status.HTTP_200_OK, data={"code": str(code)})
         except AssertionError as ae:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "Assertion error: " + str(ae)})
