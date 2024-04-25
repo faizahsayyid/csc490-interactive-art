@@ -10,4 +10,5 @@ urlpatterns = [
     path('actions/', GetActionsForDevices.as_view()),
     path('action-params/', GetRequiredAdditionalParamsForActions.as_view()),
     path('create-project/', CreateProject.as_view()),
+    path('projects/<int:pk>/download/', SendCodeToBoard.as_view()),
 ]
