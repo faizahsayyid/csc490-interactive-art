@@ -6,6 +6,8 @@ import { EXAMPLE_PROJECTS } from "../constants/example-data";
 export const Home: React.FC = () => {
   const projects = EXAMPLE_PROJECTS;
 
+  console.log("token: ", localStorage.getItem("token"));
+
   return (
     <>
       <div className="d-flex justify-content-between my-5 ms-2">

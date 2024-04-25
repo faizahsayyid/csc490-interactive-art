@@ -1,22 +1,52 @@
-import { useMutation } from "@tanstack/react-query";
-import { register } from "../api/auth";
+
 import { Link } from "react-router-dom";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export const SignUp = () => {
-  const registerMutation = useMutation({ mutationFn: register });
+  const navigate = useNavigate();
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const email = (event.target as HTMLFormElement).email.value;
     const password = (event.target as HTMLFormElement).password.value;
-    var confirmPassword = (event.target as HTMLFormElement).confirmPassword.value;
+    const confirmPassword = (event.target as HTMLFormElement).confirmPassword.value;
+
     if (password !== confirmPassword) {
-      // This is checked directly as otherwise we have to force confirmPassword to be part of User type for the mutation function to work
       alert("Passwords do not match");
       return;
     }
-    registerMutation.mutate({email, password});
-  }
+
+    try {
+      const response = await axios.post("http://localhost:8000/accounts/register/", {
+        username: email,
+        email,
+        password,
+      });
+
+      const data = response.data;
+
+      console.log("Response:", data);
+
+      if (response.status === 400) {
+        console.log("error", data);
+        if (data.username) {
+          alert(`Email: ${data["username"]}`);
+        }
+        if (data.password) {
+          alert(`Password: ${data["password"]}`);
+        }
+
+      } else {
+        localStorage.setItem("token", data.token);
+        navigate("/");
+      }
+
+    } catch (error) {
+      console.error("Error in axios post:", error);
+    }
+
+  };
 
   return (
     <form
