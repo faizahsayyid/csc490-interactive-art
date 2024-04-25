@@ -13,7 +13,7 @@ import {
 import { ACTION_CONFIGS } from "../constants/action";
 import { Action } from "../types/action";
 import { useMutation } from "@tanstack/react-query";
-import { downloadDemo } from "../api/download";
+import { download } from "../api/download";
 
 /**
  * @deprecated
@@ -22,7 +22,7 @@ export const Project: React.FC = () => {
   const { projectId } = useParams();
 
   const downloadToBoardMutation = useMutation({
-    mutationFn: downloadDemo,
+    mutationFn: download,
   });
 
   const project = EXAMPLE_PROJECTS[projectId ? parseInt(projectId) ?? 0 : 0];
@@ -30,7 +30,8 @@ export const Project: React.FC = () => {
   const actionConfig = ACTION_CONFIGS[Action.NEGATE_OUTPUT_ON_INPUT];
 
   const onDownload = () => {
-    downloadToBoardMutation.mutate();
+    // @ts-ignore
+    downloadToBoardMutation.mutate(projectId)
   };
 
   return (
