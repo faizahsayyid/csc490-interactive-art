@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { Header } from "./Header";
 import "./Root.css";
-import { useState } from "react";
 
 export const Root: React.FC = () => {
   const location = useLocation();
