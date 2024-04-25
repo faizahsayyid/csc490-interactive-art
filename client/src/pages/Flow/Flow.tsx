@@ -88,8 +88,8 @@ export const Flow: React.FC = () => {
   );
   const [interactions, setInteractions] = useState<InteractionFlow[]>([]);
 
-  const [showDeviceModal, setShowDeviceModal] = useState(false); 
-  const [showInteractionModal, setShowInteractionModal] = useState(false); 
+  const [showDeviceModal, setShowDeviceModal] = useState(false);
+  const [showInteractionModal, setShowInteractionModal] = useState(false);
 
   const toggleDeviceModal = () => setShowDeviceModal(!showDeviceModal);
   const toggleInteractionModal = () => {
@@ -124,7 +124,6 @@ export const Flow: React.FC = () => {
     //   lastModified: new Date(),
     // });
   }, [nodes, edges, interactions]);
-
 
   const [lastAddedEdge, setLastAddedEdge] = useState<any | null>(null);
 
@@ -355,12 +354,14 @@ export const Flow: React.FC = () => {
       >
         <Background />
       </ReactFlow>
-      <button
-        className="btn btn-primary position-fixed bottom-0 end-0 me-4 mb-4 p-3"
-        onClick={toggleDeviceModal}
-      >
-        Add New Device
-      </button>
+      <div className="position-fixed bottom-0 end-0 me-4 mb-4 p-3">
+        <button className="btn btn-primary me-3" onClick={toggleDeviceModal}>
+          Add New Device
+        </button>
+        <Link className="btn btn-primary" to={`/project/${projectId}/review`}>
+          Upload Design To Board
+        </Link>
+      </div>
 
       <DeviceModal
         showModal={showDeviceModal}
