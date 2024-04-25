@@ -21,5 +21,4 @@ export type Project = {
   outputDevices: DeviceConfig<OutputDevice>[];
   interactions: Interaction[];
   lastModified: Date;
-  owner: number;
 };
