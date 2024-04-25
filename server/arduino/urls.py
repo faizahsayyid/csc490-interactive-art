@@ -28,4 +28,5 @@ urlpatterns = [
     path('projects/<int:project_id>/output-devices/<int:device_id>/', OutputDeviceDetailsView.as_view()),
     path('projects/<int:project_id>/interactions/', InteractionListView.as_view()),
     path('projects/<int:project_id>/interactions/<int:interaction_id>/', InteractionDetailsView.as_view()),
+    path('projects/<int:pk>/download/', SendCodeToBoard.as_view()),
 ]

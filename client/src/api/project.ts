@@ -2,8 +2,12 @@ import axios from "axios";
 import { API_URL } from "./config";
 import { Project } from "../types/project";
 
-export const getProjects = async (): Promise<void> => {
-  return axios.get(`${API_URL}/arduino/projects/`);
+export const getProjects = async (token: string): Promise<Project[]> => {
+  return axios.get(`${API_URL}/arduino/projects/`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 };
 
 export const getProjectById = async ({

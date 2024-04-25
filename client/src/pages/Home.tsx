@@ -1,10 +1,21 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ProjectTable } from "../components/project/ProjectTable";
 import { Link } from "react-router-dom";
-import { EXAMPLE_PROJECTS } from "../constants/example-data";
+import { Project } from "../types/project";
+import { getProjects } from "../api/project";
 
 export const Home: React.FC = () => {
-  const projects = EXAMPLE_PROJECTS;
+  const [projects, setProjects] = useState<Project[]>([]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      getProjects(token).then((data) => {
+        setProjects(data);
+      });
+    }
+  }
+  , []);
 
   console.log("token: ", localStorage.getItem("token"));
 
