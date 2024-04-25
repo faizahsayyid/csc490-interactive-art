@@ -24,19 +24,18 @@ class SendCodeToBoard(APIView):
             code = inoCodeDataStructure()
             # Data is a list of lists of form: [input_pin: Optional[int], output_pins: List[int], action: str, *args: list]
             # Each list represents some connection between device (solo output, or input -> output(s))
-            data = request.data
-            if not isinstance(data, list) or not all(isinstance(x, list) for x in data):
-                return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "Data must be a list of lists."})
-            
-            for connection in data:
-                if len(connection) < 3:
-                    return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "Each connection must have at least 3 elements."})
-                
-                input_pin = connection[0]
-                output_pins = connection[1]
-                action_str = connection[2]
-                arguments = connection[3:]
-                
+            project_id = request.data.get("project_id")
+            project = Project.objects.get(id=project_id)
+            # Assume project has been created with all required information
+            for interaction in Interaction.objects.filter(project=project):
+
+                # Assuming input and output devices are already assigned with their pins
+                input_pin = interaction.input_device.pin
+                output_pins = [interaction.output_device.pin]
+                # if multiple op devices are allowed: output_pins = [output_device.pin for output_device in interaction.output_devices.all()]
+                action_str = interaction.action
+                arguments = interaction.additional_variables
+
                 if not (isinstance(input_pin, int) or input_pin is None):
                     return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "input_pin must be an integer or None."})
                 if not isinstance(output_pins, list) or not all(isinstance(x, int) for x in output_pins):

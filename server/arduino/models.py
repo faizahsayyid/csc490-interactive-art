@@ -7,10 +7,7 @@ class Project(models.Model):
     """
     A project is a collection of input and output devices that are connected to each other.
     """
-    # @TODO revert back to required version 
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-
-    # owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=255, unique=True)
     last_modified = models.DateTimeField(auto_now=True)
 
@@ -25,6 +22,7 @@ class InputDevice(models.Model):
 
     project = models.ForeignKey(Project, related_name="input_devices", on_delete=models.CASCADE)
     device_name = models.CharField(max_length=255)
+    pin = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return self.device_name
@@ -37,6 +35,7 @@ class OutputDevice(models.Model):
 
     project = models.ForeignKey(Project, related_name="output_devices", on_delete=models.CASCADE)
     device_name = models.CharField(max_length=255)
+    pin = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return self.device_name
