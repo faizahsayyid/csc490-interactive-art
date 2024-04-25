@@ -1,34 +1,8 @@
-import React, { useEffect } from "react";
 import { API_URL } from "../api/config";
 // import { useMutation } from "@tanstack/react-query";
-import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { Link } from "react-router-dom";
 
 export const SignUp = () => {
-  const navigate = useNavigate();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  // Update isLoggedIn state
-  useEffect(() => {
-    console.log("Entering login page");
-    if (localStorage.getItem("token")) {
-      console.log("token exists, will go from signup to /");
-      setIsLoggedIn(true);
-    } else {
-      console.log("token does not exist, will stay in signup page");
-      setIsLoggedIn(false);
-    }
-  }
-  , []);
-
-  // Redirect to home page if logged in
-  useEffect(() => {
-    if (isLoggedIn) {
-      console.log("token exists, navigating to /");
-      navigate("/");
-    }
-  }
-  , [isLoggedIn]);
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -62,7 +36,6 @@ export const SignUp = () => {
       } else {
         console.log("register successful");
         localStorage.setItem("token", data.access);
-        setIsLoggedIn(true);
         return;
       }
   

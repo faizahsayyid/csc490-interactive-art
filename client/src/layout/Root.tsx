@@ -7,32 +7,24 @@ export const Root: React.FC = () => {
   const location = useLocation();
   const projectPathRegex = /^\/project\/[^/]+$/;
   const isFullWidth = projectPathRegex.test(location.pathname);
-
-  // console.log("token: ", localStorage.getItem("token"));
   const isLoggedIn = (localStorage.getItem("token") != '');
-  // console.log("isLoggedIn: ", isLoggedIn);
 
-
-  // // Redirect to login page if not logged in
-  // if (!isLoggedIn && !["/login", "/register"].includes(location.pathname)) {
-  //   window.location.href = "/login";
-  //   return null;
+  // Redirect to login page if not logged in && not on login or register page
+  if (!isLoggedIn && !["/login", "/register"].includes(location.pathname)) {
+    console.log("redirecting to login");
+    window.location.href = "/login";
+    return null;
   
-  // // Redirect to home page if logged in && on login or register page
-  // } else if (
-  //   isLoggedIn &&
-  //   ["/login", "/register"].includes(location.pathname)
-  
-  // // Redirect to home page if not logged in && on home page
-  // ) {
-  //   window.location.href = "/";
-  //   return null;
-  // }
+  // Redirect to home page if logged in && on login or register page
+  } else if (isLoggedIn && ["/login", "/register"].includes(location.pathname)) {
+    console.log("redirecting to home");
+    window.location.href = "/";
+    return null;
+  }
 
   return (
     <>
       <Header isLoggedIn={isLoggedIn}/>
-      {/* <Header /> */}
       <main
         className={`${isFullWidth ? "container-fluid" : "container mt-3 mb-5"}`}
       >

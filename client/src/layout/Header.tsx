@@ -1,5 +1,4 @@
-import React, { useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 // import { logout } from "../api/auth";
 // import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
@@ -12,23 +11,7 @@ type HeaderProps = {
 
 export const Header: React.FC<HeaderProps> = ({ }) => {
   // const logoutMutation = useMutation({ mutationFn: logout });
-  const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-    if (localStorage.getItem("token")) {
-      setIsLoggedIn(true);
-    } else {
-      setIsLoggedIn(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!isLoggedIn) {
-      navigate("/login");
-    }
-  }
-  , [isLoggedIn]);
 
   const onLogout = async () => {
     try {
