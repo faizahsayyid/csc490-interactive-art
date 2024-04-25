@@ -7,77 +7,51 @@ type User = {
 };
 
 export const login = async ({ email, password }: User): Promise<void> => {
-  
-  try {
-    const response = await fetch(`${API_URL}/accounts/login/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username: email,
-        password,
-      }),
-    });
 
-    const data = await response.json();
+  const response = await axios.post(`${API_URL}/accounts/login/`, {
+    username: email,
+    password,
+  });
 
-    if (data.status === 400) {
-      console.log("error", data);
-    } else {
-      console.log(data);
-      localStorage.setItem("token", data.access);
-    }
+  const data = response.data;
 
-  } catch (error) {
-    console.error("error", error);
+  if (response.status === 400) {
+    console.log("error", data);
+    alert(data["message"]);
+
+  } else {
+    localStorage.setItem("token", data.access);
+    window.location.reload();
   }
-  // const data = await axios.post(`${API_URL}/accounts/login/`, {
-  //   username: email,
-  //   password,
-  // });
-
-  // // @ts-expect-error - access is in the response
-  // localStorage.setItem("token", data.access);
 };
 
 export const logout = async (): Promise<void> => {
   await axios.post(`${API_URL}/accounts/logout/`);
-  localStorage.setItem("token", "");
+  localStorage.removeItem("token");
+  window.location.reload();
 };
 
-export const register = async ({ email, password }: User): Promise<void> => {
+export const register = async ({email, password}: User): Promise<void> => {
 
-  try {
-    const response = await fetch(`${API_URL}/accounts/register/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username: email,
-        email,
-        password,
-      }),
-    });
+  const response = await axios.post(`${API_URL}/accounts/register/`, {
+    username: email,
+    email,
+    password
+  });
 
-    const data = await response.json();
+  const data = response.data;
 
-    if (data.status === 400) {
-      console.log("error", data);
-    } else {
-      localStorage.setItem("token", data.access);
+  if (response.status === 400) {
+    console.log("error", data);
+    if (data.username) {
+      alert(`Email: ${data["username"]}`);
+    }
+    if (data.password) {
+      alert(`Password: ${data["password"]}`);
     }
 
-  } catch (error) {
-    console.error("error", error);
+  } else {
+    localStorage.setItem("token", data.access);
+    window.location.reload();
   }
-  // const data = await axios.post(`${API_URL}/accounts/register/`, {
-  //   username: email,
-  //   email,
-  //   password,
-  // });
-
-  // // @ts-expect-error - access is in the response
-  // localStorage.setItem("token", data.access);
 };
