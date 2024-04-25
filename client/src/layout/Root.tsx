@@ -1,26 +1,25 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { Header } from "./Header";
 import "./Root.css";
+import { useState } from "react";
 
 export const Root: React.FC = () => {
   const location = useLocation();
   const projectPathRegex = /^\/project\/[^/]+$/;
   const isFullWidth = projectPathRegex.test(location.pathname);
-  const isLoggedIn = (localStorage.getItem("token") != '');
+  var isLoggedIn = localStorage.getItem("token") !== null;
 
-  // Redirect to login page if not logged in && not on login or register page
-  if (!isLoggedIn && !["/login", "/register"].includes(location.pathname)) {
-    console.log("redirecting to login");
-    window.location.href = "/login";
-    return null;
-  
-  // Redirect to home page if logged in && on login or register page
-  } else if (isLoggedIn && ["/login", "/register"].includes(location.pathname)) {
-    console.log("redirecting to home");
-    window.location.href = "/";
-    return null;
+  useEffect(() => {
+    if (!isLoggedIn && !["/login", "/register"].includes(location.pathname)) {
+      window.location.href = "/login";
+    
+    } else if (isLoggedIn && ["/login", "/register"].includes(location.pathname)) {
+      window.location.href = "/";
+    }
   }
+  , [isLoggedIn, location.pathname]);
+
 
   return (
     <>
