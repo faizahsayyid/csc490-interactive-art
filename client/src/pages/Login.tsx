@@ -1,46 +1,17 @@
 import React from "react";
-// import { login } from "../api/auth";
-// import { useMutation } from "@tanstack/react-query";
+import { login } from "../api/auth";
+import { useMutation } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
-import { API_URL } from "../api/config";
 
 export const Login = () => {
+  const loginMutation = useMutation({ mutationFn: login });
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const email = (event.target as HTMLFormElement).email.value;
     const password = (event.target as HTMLFormElement).password.value;
-
-    try {
-      const response = await fetch(`${API_URL}/accounts/login/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: email,
-          password,
-        }),
-      });
-  
-      const data = await response.json();
-  
-      if (response.status === 400) {
-        console.log("error", data);
-        alert(data["message"]);
-        return;
-  
-      } else {
-        console.log(data);
-        localStorage.setItem("token", data.access);
-        return;
-      }
-  
-    } catch (error) {
-      console.error("error", error);
-      return;
-    }
-  };
+    loginMutation.mutate({ email, password });
+  }
 
   return (
     <form
