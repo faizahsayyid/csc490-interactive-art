@@ -1,7 +1,7 @@
-import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { logout } from "../api/auth";
 import { useMutation } from "@tanstack/react-query";
+
 
 type HeaderProps = {
   isLoggedIn: boolean;
@@ -9,12 +9,10 @@ type HeaderProps = {
 
 export const Header: React.FC<HeaderProps> = ({ isLoggedIn }) => {
   const logoutMutation = useMutation({ mutationFn: logout });
-  const navigate = useNavigate();
 
   const onLogout = () => {
     logoutMutation.mutate();
-    navigate("/login");
-  };
+  }
 
   return (
     <header>

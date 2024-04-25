@@ -1,19 +1,22 @@
-import React from "react";
-import { register } from "../api/auth";
 import { useMutation } from "@tanstack/react-query";
-import { Link, useNavigate } from "react-router-dom";
+import { register } from "../api/auth";
+import { Link } from "react-router-dom";
 
 export const SignUp = () => {
   const registerMutation = useMutation({ mutationFn: register });
-  const navigate = useNavigate();
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const email = (event.target as HTMLFormElement).email.value;
     const password = (event.target as HTMLFormElement).password.value;
-    await registerMutation.mutate({ email, password });
-    navigate("/");
-  };
+    var confirmPassword = (event.target as HTMLFormElement).confirmPassword.value;
+    if (password !== confirmPassword) {
+      // This is checked directly as otherwise we have to force confirmPassword to be part of User type for the mutation function to work
+      alert("Passwords do not match");
+      return;
+    }
+    registerMutation.mutate({email, password});
+  }
 
   return (
     <form

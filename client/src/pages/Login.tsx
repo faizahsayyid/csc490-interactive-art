@@ -1,20 +1,17 @@
 import React from "react";
 import { login } from "../api/auth";
 import { useMutation } from "@tanstack/react-query";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export const Login = () => {
   const loginMutation = useMutation({ mutationFn: login });
-  const navigate = useNavigate();
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const email = (event.target as HTMLFormElement).email.value;
     const password = (event.target as HTMLFormElement).password.value;
-    console.log(email, password);
-    await loginMutation.mutate({ email, password });
-    navigate("/");
-  };
+    loginMutation.mutate({ email, password });
+  }
 
   return (
     <form
