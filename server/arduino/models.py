@@ -22,11 +22,7 @@ class InputDevice(models.Model):
 
     project = models.ForeignKey(Project, related_name="input_devices", on_delete=models.CASCADE)
     device_name = models.CharField(max_length=255)
-<<<<<<< HEAD
     pin = models.IntegerField(default=1)
-=======
-    pin = models.IntegerField(null=True, blank=True)
->>>>>>> download
 
     def __str__(self):
         return self.device_name
@@ -39,11 +35,7 @@ class OutputDevice(models.Model):
 
     project = models.ForeignKey(Project, related_name="output_devices", on_delete=models.CASCADE)
     device_name = models.CharField(max_length=255)
-<<<<<<< HEAD
     pin = models.IntegerField(default=2)
-=======
-    pin = models.IntegerField(null=True, blank=True)
->>>>>>> download
 
     def __str__(self):
         return self.device_name
