@@ -28,24 +28,7 @@ export const Home: React.FC = () => {
     }
   }
   , []);
-
-  // useEffect(() => {
-  //   const token = localStorage.getItem("token");
-  //   if (token) {
-  //     // Fetch projects when the component mounts
-  //     getProjectsMutation.mutate({ token });
-  //   }
-  // }, []);
   
-  // // React to mutation status
-  // useEffect(() => {
-  //   if (getProjectsMutation.isSuccess) {
-  //     // Update the state with the fetched projects
-  //     setProjects(getProjectsMutation.data || []);
-  //   }
-  // }, [getProjectsMutation.isSuccess, getProjectsMutation.data]);
-
-
   return (
     <>
       <div className="d-flex justify-content-between my-5 ms-2">
