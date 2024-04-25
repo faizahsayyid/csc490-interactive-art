@@ -1,14 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import { Root } from "../layout/Root";
-import {
-  Home,
-  Project,
-  CreateProject,
-  Flow,
-  SignUp,
-  Login,
-  Help,
-} from "../pages";
+import { Home, Flow, SignUp, Login, Help } from "../pages";
 
 const router = createBrowserRouter([
   {
@@ -17,7 +9,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <Home />, // TODO: CHANGE BACK TO HOME
+        element: <Home />,
       },
       {
         path: "/login",
@@ -26,14 +18,6 @@ const router = createBrowserRouter([
       {
         path: "/register",
         element: <SignUp />,
-      },
-      {
-        path: "/create",
-        element: <CreateProject />,
-      },
-      {
-        path: "/project_dep/:projectId",
-        element: <Project />,
       },
       {
         path: "/project/:projectId",

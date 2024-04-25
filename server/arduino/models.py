@@ -25,6 +25,7 @@ class InputDevice(models.Model):
 
     project = models.ForeignKey(Project, related_name="input_devices", on_delete=models.CASCADE)
     device_name = models.CharField(max_length=255)
+    pin = models.IntegerField(default=1)
 
     def __str__(self):
         return self.device_name
@@ -37,6 +38,7 @@ class OutputDevice(models.Model):
 
     project = models.ForeignKey(Project, related_name="output_devices", on_delete=models.CASCADE)
     device_name = models.CharField(max_length=255)
+    pin = models.IntegerField(default=2)
 
     def __str__(self):
         return self.device_name

@@ -29,6 +29,7 @@ class Register(APIView):
         if serializer.is_valid():
             user = serializer.save()
             token, created = Token.objects.get_or_create(user=user)
+            login(request, user)
             return JsonResponse({'message': 'Account created successfully', "access": token.key}, status=201)
         return JsonResponse(serializer.errors, status=400)
     
@@ -40,7 +41,7 @@ class Login(APIView):
         user = authenticate(username=data['username'], password=data['password'])
         if user is not None:
             token, _ = Token.objects.get_or_create(user=user)
-            # login(request, user)
+            login(request, user)
             return JsonResponse({'message': 'Login successful', "access": token.key, "username": data["username"]}, status=200)
         return JsonResponse({'message': 'Invalid credentials'}, status=400)
     

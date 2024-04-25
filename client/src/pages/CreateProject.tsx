@@ -1,5 +1,4 @@
 import React from "react";
-// @TODO: Make this page create a new project
 
 // import { useNavigate } from "react-router-dom";
 import {
@@ -15,6 +14,9 @@ import { InputDevice } from "../types/device/input-device";
 import { OutputDevice } from "../types/device/output-device";
 import axios from "axios";
 
+/**
+ * @deprecated
+ */
 export const CreateProject: React.FC = () => {
   // const navigate = useNavigate();
 
@@ -23,9 +25,6 @@ export const CreateProject: React.FC = () => {
     return typeof value === "string" ? parseInt(value) : 0;
   };
 
-  /**
-   * @todo Add validation for form fields
-   */
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     console.log("submitting form");
     event.preventDefault();

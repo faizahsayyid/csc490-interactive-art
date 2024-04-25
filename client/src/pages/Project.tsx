@@ -15,6 +15,9 @@ import { Action } from "../types/action";
 import { useMutation } from "@tanstack/react-query";
 import { downloadDemo } from "../api/download";
 
+/**
+ * @deprecated
+ */
 export const Project: React.FC = () => {
   const { projectId } = useParams();
 
@@ -24,7 +27,6 @@ export const Project: React.FC = () => {
 
   const project = EXAMPLE_PROJECTS[projectId ? parseInt(projectId) ?? 0 : 0];
 
-  /** @todo pull out interaction form into new component and handle multiple interactions */
   const actionConfig = ACTION_CONFIGS[Action.NEGATE_OUTPUT_ON_INPUT];
 
   const onDownload = () => {
