@@ -1,6 +1,7 @@
 import axios from "axios";
 import { API_URL } from "./config";
 import { Project } from "../types/project";
+import { getHeaders } from "./getHeaders";
 
 export const getProjects = async (token: string): Promise<Project[]> => {
   return axios.get(`${API_URL}/arduino/projects/`, {
@@ -15,13 +16,22 @@ export const getProjectById = async ({
 }: {
   projectId?: string;
 }): Promise<Project> => {
-  return axios.get(`${API_URL}/arduino/projects/${projectId}`);
+  return axios.get(`${API_URL}/arduino/projects/${projectId}/`, {
+    headers: getHeaders(),
+  });
 };
 
 export const createProject = async ({
   name,
-}: {
-  name: string;
-}): Promise<Project> => {
-  return axios.post(`${API_URL}/arduino/projects/`, { name });
+}: Partial<Project>): Promise<Project> => {
+  return axios.post(
+    `${API_URL}/arduino/projects/`,
+    { name },
+    {
+      withCredentials: true,
+      xsrfCookieName: "csrftoken",
+      xsrfHeaderName: "X-CSRFToken",
+      // headers: getHeaders(),
+    }
+  );
 };
