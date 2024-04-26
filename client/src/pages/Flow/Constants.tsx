@@ -32,8 +32,8 @@ export const ACTION_TO_NAME: object = {
 };
 
 export const ARGS_TO_DESCRIPTION: object = {
-    hold_time: "Duration input must be held active for the action to trigger.",
-    blink_duration: "Duration for which the output device should blink.",
-    after_action: "Default state to return to after the primary action. (0: Off, 1: On, 2: Return to previous state)",
-    second_click_time: "Time Interval between two activations to trigger the action.",
+    hold_time: "Duration input must be held active for the action to trigger in ms",
+    blink_duration: "Duration for which the output device should blink in ms",
+    after_action: "Default state to return to after the primary action (0: Off, 1: On, 2: Return to previous state)",
+    second_click_time: "Time Interval between two activations to trigger the action in ms",
 };
