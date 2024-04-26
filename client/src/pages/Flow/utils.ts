@@ -17,8 +17,9 @@ const NameToEnum = (name: string): any => {
   return name.replace(" ", "_").toUpperCase();
 };
 
-export const InteractionFlowToInteraction = (intFlow: InteractionFlow): Interaction => {
-  
+export const InteractionFlowToInteraction = (
+  intFlow: InteractionFlow
+): Interaction => {
   let action_key = String(intFlow.action);
   let inputDeviceConfig = InputNodeToInputDevice(intFlow.sourceDevice);
   let outputDeviceConfig = OutputNodeToOutputDevice(intFlow.targetDevice);
@@ -26,13 +27,15 @@ export const InteractionFlowToInteraction = (intFlow: InteractionFlow): Interact
 
   return {
     action_key: action_key,
-    inputDeviceConfig: inputDeviceConfig,
-    outputDeviceConfig: outputDeviceConfig,
+    inputDevice: inputDeviceConfig,
+    outputDevice: outputDeviceConfig,
     additionalVariables: additionalVariables,
   };
 };
 
-export const InputNodeToInputDevice = (device: any): DeviceConfig<InputDevice> => {
+export const InputNodeToInputDevice = (
+  device: any
+): DeviceConfig<InputDevice> => {
   let deviceType = NameToEnum(device.data.name);
   if (device.data.type === "input") {
     if (deviceType in InputDevice) {
@@ -56,7 +59,9 @@ export const InputNodeToInputDevice = (device: any): DeviceConfig<InputDevice> =
   }
 };
 
-export const OutputNodeToOutputDevice = (device: any): DeviceConfig<OutputDevice> => {
+export const OutputNodeToOutputDevice = (
+  device: any
+): DeviceConfig<OutputDevice> => {
   let deviceType = NameToEnum(device.data.name);
   if (device.data.type === "output") {
     if (deviceType in OutputDevice) {

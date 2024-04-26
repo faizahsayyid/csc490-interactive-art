@@ -213,6 +213,7 @@ class ProjectDetailView(View):
                     else:
                         if "id" in device:
                             device.pop("id")
+                        device.pop("project")
                         InputDevice.objects.create(project=project, **device)
             
             # if the user is trying to edit the output devices
@@ -227,6 +228,7 @@ class ProjectDetailView(View):
                     else:
                         if "id" in device:
                             device.pop("id")
+                        device.pop("project")
                         OutputDevice.objects.create(project=project, **device)
 
             # if the user is trying to edit the interactions
