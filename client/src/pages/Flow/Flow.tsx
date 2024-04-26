@@ -9,13 +9,13 @@ import ReactFlow, {
   useEdgesState,
 } from "reactflow";
 // import { EXAMPLE_PROJECTS } from "../../constants/example-data";
-// import { useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import {
-  // INPUT_DEVICE_INFO,
+  INPUT_DEVICE_INFO,
   INPUT_DEVICE_IMAGES,
 } from "../../constants/device/input-device";
 import {
-  // OUTPUT_DEVICE_INFO,
+  OUTPUT_DEVICE_INFO,
   OUTPUT_DEVICE_IMAGES,
 } from "../../constants/device/output-device";
 import CustomNode from "./CustomNode";
@@ -39,7 +39,7 @@ import {
   OutputNodeToOutputDevice,
 } from "./utils";
 import axios from "axios";
-// import { API_URL } from "../../api/config";
+import { API_URL } from "../../api/config";
 
 // import axios from "axios";
 
@@ -71,58 +71,87 @@ interface InteractionFlow {
 }
 
 export const Flow: React.FC = () => {
-  // @TODO - Load project state from backend
-  // const { projectId } = useParams();
-
-  // @JoshPugli change this to the actual project id
-  const projectId: string = "1";
-  // const userID: string = "1";
-
-  const [project, setProject] = useState<Project | null>(null);
-
-  const fetchProject = async (projectId: string) => {
-    try {
-      const response = await axios.get(
-        `http://localhost:8000/arduino/projects/${projectId}`
-      );
-      console.log("Fetched project:", response.data);
-      setProject(response.data);
-    } catch (error) {
-      console.error("Failed to fetch project:", error);
-    }
-  };
+  useEffect(() => {
+    console.log("Testing axios");
+    axios
+      .get(`${API_URL}:8000/accounts/test/`, {
+        headers: {
+          Authorization: `Token ${localStorage.getItem("token")}`,
+        },
+      })
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, []);
 
   useEffect(() => {
-    if (projectId) {
-      fetchProject(projectId);
-    }
-  }, [projectId]);
+    axios
+      .get(`${API_URL}/arduino/projects/${projectId}/`, {
+        headers: {
+          Authorization: `${localStorage.getItem("token")}`,
+        },
+      })
+      .then((response) => {
+        let project = response.data;
+        console.log("Project:", project);
+        let projectID = project.id;
+        let projectName = project.name;
+        let inputDevices = project.input_devices;
+        let outputDevices = project.output_devices;
+        let interactions = project.interactions;
+        let lastModified = project.lastModified;
+        let CurrentProject: Project = {
+          id: projectID,
+          name: projectName,
+          inputDevices: inputDevices,
+          outputDevices: outputDevices,
+          interactions: interactions,
+          lastModified: lastModified,
+        };
+        setProject(CurrentProject);
+        console.log("Current project:", CurrentProject);
 
-  const [currentConnection, setCurrentConnection] = useState<CurrentConnection>(
-    { id: null, source: null, target: null }
-  );
-  const [interactions, setInteractions] = useState<InteractionFlow[]>([]);
+        const initialInputDevices = project.input_devices.map(
+          (inputDevice, index) => (
+            console.log("Input Device:", inputDevice),
+            {
+            id: uuidv4(),
+            type: "custom",
+            data: {
+              label: INPUT_DEVICE_INFO[inputDevice.device_name].name,
+              name: INPUT_DEVICE_INFO[inputDevice.device_name].name,
+              image: INPUT_DEVICE_IMAGES[inputDevice.device_name],
+              description: INPUT_DEVICE_INFO[inputDevice.device_name].description,
+              type: "input",
+            },
+            position: { x: input_x, y: start_y + y_step * index },
+          })
+        );
 
-  const [showDeviceModal, setShowDeviceModal] = useState(false);
-  const [showInteractionModal, setShowInteractionModal] = useState(false);
+        const initialOutputDevices = project.output_devices.map(
+          (outputDevice, index) => ({
+            id: uuidv4(),
+            type: "custom",
+            data: {
+              label: OUTPUT_DEVICE_INFO[outputDevice.device_name].name,
+              name: OUTPUT_DEVICE_INFO[outputDevice.device_name].name,
+              image: OUTPUT_DEVICE_IMAGES[outputDevice.device_name],
+              description: OUTPUT_DEVICE_INFO[outputDevice.device_name].description,
+              type: "output",
+            },
+            position: { x: output_x, y: start_y + y_step * index },
+          })
+        );
 
-  const toggleDeviceModal = () => setShowDeviceModal(!showDeviceModal);
-  const toggleInteractionModal = () => {
-    setShowInteractionModal(!showInteractionModal);
-  };
-
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-
-  const numInputDevices: number = nodes.filter(
-    (node) => node.data.type === "input"
-  ).length;
-  const numOutputDevices: number = nodes.filter(
-    (node) => node.data.type === "output"
-  ).length;
-  if (numInputDevices + numOutputDevices !== nodes.length) {
-    console.error("Error: Incorrect number of input and output devices");
-  }
+        setNodes([...initialInputDevices, ...initialOutputDevices]);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, []);
 
   // useEffect(() => {
   //   // @TODO - Load project state from backend, modify loading logic
@@ -158,6 +187,41 @@ export const Flow: React.FC = () => {
 
   //   setNodes([...initialInputDevices, ...initialOutputDevices]);
   // }, []);
+
+  // @TODO - Load project state from backend
+  const { projectId } = useParams();
+  console.log("Project ID:", projectId);
+
+  // @JoshPugli change this to the actual project id
+  // const userID: string = "1";
+
+  const [project, setProject] = useState<Project | null>(null);
+
+  const [currentConnection, setCurrentConnection] = useState<CurrentConnection>(
+    { id: null, source: null, target: null }
+  );
+  const [interactions, setInteractions] = useState<InteractionFlow[]>([]);
+
+  const [showDeviceModal, setShowDeviceModal] = useState(false);
+  const [showInteractionModal, setShowInteractionModal] = useState(false);
+
+  const toggleDeviceModal = () => setShowDeviceModal(!showDeviceModal);
+  const toggleInteractionModal = () => {
+    setShowInteractionModal(!showInteractionModal);
+  };
+
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+
+  const numInputDevices: number = nodes.filter(
+    (node) => node.data.type === "input"
+  ).length;
+  const numOutputDevices: number = nodes.filter(
+    (node) => node.data.type === "output"
+  ).length;
+  if (numInputDevices + numOutputDevices !== nodes.length) {
+    console.error("Error: Incorrect number of input and output devices");
+  }
 
   const [lastAddedEdge, setLastAddedEdge] = useState<any | null>(null);
 
