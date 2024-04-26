@@ -1,17 +1,25 @@
 import React from "react";
-import { login } from "../api/auth";
-import { useMutation } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 export const Login = () => {
-  const loginMutation = useMutation({ mutationFn: login });
 
-  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const email = (event.target as HTMLFormElement).email.value;
-    const password = (event.target as HTMLFormElement).password.value;
-    loginMutation.mutate({ email, password });
-  }
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const email = (document.getElementById("email") as HTMLInputElement).value;
+    const password = (document.getElementById("password") as HTMLInputElement).value;
+
+    try {
+      const response = await axios.post("http://localhost:8000/accounts/login/", {
+        email,
+        password,
+      });
+      localStorage.setItem("token", response.data.token);
+      window.location.href = "/";
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <form

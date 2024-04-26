@@ -6,7 +6,7 @@ import { getHeaders } from "./getHeaders";
 export const getProjects = async (token: string): Promise<Project[]> => {
   return axios.get(`${API_URL}/arduino/projects/`, {
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `${token}`,
     },
   });
 };

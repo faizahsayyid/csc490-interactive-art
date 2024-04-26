@@ -55,6 +55,12 @@ INSTALLED_APPS = [
     'arduino',
 ]
 
+REST_FRAMEWORK = {
+'DEFAULT_AUTHENTICATION_CLASSES': (
+    'rest_framework.authentication.TokenAuthentication',
+),
+}
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -142,6 +148,7 @@ DATABASES = {
     'default': env.db_url('DATABASE_URL', default='sqlite:///db.sqlite3'),
 }
 
+# AUTH_USER_MODEL = 'django.contrib.auth.models.User'
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators

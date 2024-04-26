@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import { Root } from "../layout/Root";
-import { Home, Flow, SignUp, Login, Help } from "../pages";
+import { Home, Flow, SignUp, Login, Help, ReviewDesign } from "../pages";
 
 const router = createBrowserRouter([
   {
@@ -26,6 +26,10 @@ const router = createBrowserRouter([
       {
         path: "/help",
         element: <Help />,
+      },
+      {
+        path: "/project/:projectId/review",
+        element: <ReviewDesign />,
       },
     ],
   },
