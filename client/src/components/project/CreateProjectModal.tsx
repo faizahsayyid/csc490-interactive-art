@@ -28,7 +28,7 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
     onSuccess: (res) => {
       const project = res.data;
       onClose();
-      navigate(`/projects/${project.id}`);
+      navigate(`/project/${project.id}`);
     },
   });
   const navigate = useNavigate();
