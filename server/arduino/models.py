@@ -19,7 +19,7 @@ class InputDevice(models.Model):
     """
     An input device is a device that can send a signal to an output device
     """
-
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=True)
     project = models.ForeignKey(Project, related_name="input_devices", on_delete=models.CASCADE)
     device_name = models.CharField(max_length=255)
     pin = models.IntegerField(default=1)
@@ -32,7 +32,7 @@ class OutputDevice(models.Model):
     """
     An output device is a device that can receive a signal from an input device
     """
-
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=True)
     project = models.ForeignKey(Project, related_name="output_devices", on_delete=models.CASCADE)
     device_name = models.CharField(max_length=255)
     pin = models.IntegerField(default=2)

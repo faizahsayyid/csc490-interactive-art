@@ -223,7 +223,6 @@ class ProjectDetailView(APIView):
                 # Create new input devices from provided data
                 input_devices = data.get("inputDevices", [])
                 for device in input_devices:
-                    device.pop("id", None)
                     InputDevice.objects.create(project=project, **device)
 
             if "outputDevices" in data:
@@ -233,7 +232,6 @@ class ProjectDetailView(APIView):
                 # Create new output devices from provided data
                 output_devices = data.get("outputDevices", [])
                 for device in output_devices:
-                    device.pop("id", None)
                     OutputDevice.objects.create(project=project, **device)
 
 
@@ -247,20 +245,24 @@ class ProjectDetailView(APIView):
                 for interaction in interactions:
 
                     # check if input_device exists in database
-                    input_device = interaction.get("inputDeviceConfig", None)
-                    input_device_id = input_device.get("id", None)
-                    try:
-                        input_device = InputDevice.objects.get(id=input_device_id)
-                    except InputDevice.DoesNotExist:
-                        return JsonResponse({"error": f"Input device with id {input_device_id} does not exist"}, status=400)
+                    input_device = interaction.get("inputDevice", None)
+                    if input_device:
+                        try:
+                            print("input_device ", input_device)
+                            input_device_id = input_device.get("id", None)
+                            input_device = InputDevice.objects.get(id=input_device_id)
+                        except InputDevice.DoesNotExist:
+                            return JsonResponse({"error": f"Input device with id {input_device_id} does not exist"}, status=400)
                     
                     # check if output_device exists in database
-                    output_device = interaction.get("outputDeviceConfig", None)
-                    output_device_id = output_device.get("id", None)
-                    try:
-                        output_device = OutputDevice.objects.get(id=output_device_id)
-                    except OutputDevice.DoesNotExist:
-                        return JsonResponse({"error": f"Output device with id {output_device_id} does not exist"}, status=400)
+                    output_device = interaction.get("outputDevice", None)
+                    if output_device:
+                        try:
+                            print("output_device ", output_device)
+                            output_device_id = output_device.get("id", None)
+                            output_device = OutputDevice.objects.get(id=output_device_id)
+                        except OutputDevice.DoesNotExist:
+                            return JsonResponse({"error": f"Output device with id {output_device_id} does not exist"}, status=400)
 
                     # Create the new interaction
                     Interaction.objects.create(
