@@ -17,8 +17,9 @@ const NameToEnum = (name: string): any => {
   return name.replace(" ", "_").toUpperCase();
 };
 
-export const InteractionFlowToInteraction = (intFlow: InteractionFlow): Interaction => {
-  
+export const InteractionFlowToInteraction = (
+  intFlow: InteractionFlow
+): Interaction => {
   let action_key = String(intFlow.action);
   let inputDeviceConfig = InputNodeToInputDevice(intFlow.sourceDevice);
   let outputDeviceConfig = OutputNodeToOutputDevice(intFlow.targetDevice);
@@ -26,55 +27,59 @@ export const InteractionFlowToInteraction = (intFlow: InteractionFlow): Interact
 
   return {
     action_key: action_key,
-    inputDeviceConfig: inputDeviceConfig,
-    outputDeviceConfig: outputDeviceConfig,
+    inputDevice: inputDeviceConfig,
+    outputDevice: outputDeviceConfig,
     additionalVariables: additionalVariables,
   };
 };
 
-export const InputNodeToInputDevice = (device: any): DeviceConfig<InputDevice> => {
+export const InputNodeToInputDevice = (
+  device: any
+): DeviceConfig<InputDevice> => {
   let deviceType = NameToEnum(device.data.name);
   if (device.data.type === "input") {
     if (deviceType in InputDevice) {
       return {
-        device: deviceType,
+        device_name: deviceType,
         id: device.id,
       };
     } else {
       alert("Invalid input device type: " + deviceType);
       return {
-        device: InputDevice.BUTTON,
+        device_name: InputDevice.BUTTON,
         id: device.id,
       };
     }
   } else {
     alert("Invalid device type: " + device.type);
     return {
-      device: InputDevice.BUTTON,
+      device_name: InputDevice.BUTTON,
       id: device.id,
     };
   }
 };
 
-export const OutputNodeToOutputDevice = (device: any): DeviceConfig<OutputDevice> => {
+export const OutputNodeToOutputDevice = (
+  device: any
+): DeviceConfig<OutputDevice> => {
   let deviceType = NameToEnum(device.data.name);
   if (device.data.type === "output") {
     if (deviceType in OutputDevice) {
       return {
-        device: deviceType,
+        device_name: deviceType,
         id: device.id,
       };
     } else {
       alert("Invalid output device type: " + deviceType);
       return {
-        device: OutputDevice.LED_STRIP,
+        device_name: OutputDevice.LED_STRIP,
         id: device.id,
       };
     }
   } else {
     alert("Invalid device type: " + device.type);
     return {
-      device: OutputDevice.LED_STRIP,
+      device_name: OutputDevice.LED_STRIP,
       id: device.id,
     };
   }

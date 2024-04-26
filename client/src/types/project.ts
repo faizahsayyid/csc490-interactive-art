@@ -4,12 +4,13 @@ import { OutputDevice } from "./device/output-device";
 
 export type Interaction = {
   action_key: string;
-  inputDeviceConfig: DeviceConfig<InputDevice>;
-  outputDeviceConfig: DeviceConfig<OutputDevice>;
+  inputDevice: DeviceConfig<InputDevice>;
+  outputDevice: DeviceConfig<OutputDevice>;
   additionalVariables?: Record<string, any>;
 };
 
 export type DeviceConfig<T> = {
+  pin?: number;
   device: T;
   id?: string;
 };

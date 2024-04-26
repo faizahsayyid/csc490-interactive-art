@@ -1,18 +1,43 @@
 import React from "react";
-import { EXAMPLE_PROJECTS } from "../constants/example-data";
 import {
-  INPUT_DEVICE_IMAGES,
-  INPUT_DEVICE_INFO,
-} from "../constants/device/input-device";
-import {
-  OUTPUT_DEVICE_IMAGES,
-  OUTPUT_DEVICE_INFO,
-} from "../constants/device/output-device";
-import { ACTION_CONFIGS } from "../constants/action";
-import { Action } from "../types/action";
+  InputDevicePinForm,
+  OutputDevicePinForm,
+} from "../components/device/DevicePinForm";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { getProjectById } from "../api/project";
+import { useParams } from "react-router-dom";
+import { uploadCodeToBoard } from "../api/download";
+import { Modal, Spinner } from "react-bootstrap";
 
 export const ReviewDesign: React.FC = () => {
-  const project = EXAMPLE_PROJECTS[0];
+  const { projectId } = useParams<{ projectId: string }>();
+
+  const projectQueryResult = useQuery({
+    queryKey: ["getProjectById", projectId],
+    queryFn: () => getProjectById({ projectId }),
+  });
+
+  const uploadCodeToBoardMutation = useMutation({
+    mutationFn: uploadCodeToBoard,
+  });
+
+  const onUploadCodeToBoard = async () => {
+    await uploadCodeToBoardMutation.mutateAsync(projectId as string);
+  };
+
+  const project = projectQueryResult.data;
+
+  if (projectQueryResult.isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (projectQueryResult.isError) {
+    return <div>Error: {projectQueryResult.error.message}</div>;
+  }
+
+  if (!project) {
+    return <div>Project not found</div>;
+  }
 
   return (
     <div className="d-flex flex-column">
@@ -25,112 +50,68 @@ export const ReviewDesign: React.FC = () => {
         </div>
         {project.interactions.map((interaction, i) => {
           return (
-            <div key={i} className="list-group-item">
+            <div key={i} className="list-group-item p-3">
               <h3 className="h5">
-                Interaction 1:{" "}
-                {ACTION_CONFIGS[interaction.action_key as Action].description}
+                <b className="fw-bold">Interaction {i + 1}:</b>{" "}
+                {interaction.action_key}
               </h3>
               <h4 className="h6 fw-bold mt-4">Input Device</h4>
-              <div className="d-flex flex-column flex-md-row align-items-center gap-3 px-5 py-3">
-                <div className="d-flex align-items-center gap-3">
-                  <img
-                    className="rounded"
-                    height={75}
-                    src={
-                      INPUT_DEVICE_IMAGES[interaction.inputDeviceConfig.device]
-                    }
-                    alt="Motion Sensor"
-                  />
-                  <div>
-                    <p className="form-check-label m-0 p-0">
-                      {
-                        INPUT_DEVICE_INFO[interaction.inputDeviceConfig.device]
-                          .name
-                      }
-                    </p>
-                    <small className="form-text text-muted">
-                      {
-                        INPUT_DEVICE_INFO[interaction.inputDeviceConfig.device]
-                          .description
-                      }
-                    </small>
-                  </div>
-                </div>
-                <form className="ms-md-auto">
-                  <label className="form-label d-block m-0" htmlFor="pin1">
-                    Pin Number:
-                  </label>
-                  <div className="d-flex gap-3">
-                    <input
-                      className="form-control"
-                      type="number"
-                      name="pin1"
-                      id="pin1"
-                      min={0}
-                      defaultValue={interaction.inputDeviceConfig.id}
-                    />
-                    <button className="btn btn-secondary" type="submit">
-                      Save
-                    </button>
-                  </div>
-                </form>
-              </div>
+              <InputDevicePinForm
+                projectId={projectId as string}
+                deviceId={interaction.inputDevice.id as string}
+                inputDevice={interaction.inputDevice.device}
+                pin={interaction.inputDevice.pin}
+              />
               <h4 className="h6 fw-bold mt-4">Output Device</h4>
-              <div className="d-flex flex-column flex-md-row align-items-center gap-3 px-5 py-3">
-                <div className="d-flex align-items-center gap-3">
-                  <img
-                    className="rounded"
-                    height={75}
-                    src={
-                      OUTPUT_DEVICE_IMAGES[
-                        interaction.outputDeviceConfig.device
-                      ]
-                    }
-                    alt="Motion Sensor"
-                  />
-                  <div>
-                    <p className="form-check-label m-0 p-0">
-                      {
-                        OUTPUT_DEVICE_INFO[
-                          interaction.outputDeviceConfig.device
-                        ].name
-                      }
-                    </p>
-                    <small className="form-text text-muted">
-                      {
-                        OUTPUT_DEVICE_INFO[
-                          interaction.outputDeviceConfig.device
-                        ].description
-                      }
-                    </small>
-                  </div>
-                </div>
-                <form className="ms-md-auto">
-                  <label className="form-label d-block m-0" htmlFor="pin1">
-                    Pin Number:
-                  </label>
-                  <div className="d-flex gap-3">
-                    <input
-                      className="form-control"
-                      type="number"
-                      name="pin1"
-                      id="pin1"
-                      min={0}
-                      defaultValue={interaction.outputDeviceConfig.id}
-                    />
-                    <button className="btn btn-secondary" type="submit">
-                      Save
-                    </button>
-                  </div>
-                </form>
-              </div>
+              <OutputDevicePinForm
+                projectId={projectId as string}
+                deviceId={interaction.outputDevice.id as string}
+                outputDevice={interaction.outputDevice.device}
+                pin={interaction.outputDevice.pin}
+              />
             </div>
           );
         })}
       </div>
-      <button className="btn btn-primary mt-5 ms-auto">
+      <button
+        className="btn btn-primary mt-5 ms-auto"
+        onClick={onUploadCodeToBoard}
+      >
         Upload Design To Board
       </button>
+      <Modal show={uploadCodeToBoardMutation.isPending} centered>
+        <Modal.Body>
+          <Spinner />
+          Uploading design to board...
+        </Modal.Body>
+      </Modal>
+      <Modal show={uploadCodeToBoardMutation.isSuccess} centered>
+        <Modal.Body>
+          Your design has been successfully uploaded to the board!
+        </Modal.Body>
+        <Modal.Footer>
+          <button
+            className="btn btn-primary"
+            onClick={() => uploadCodeToBoardMutation.reset()}
+          >
+            Close
+          </button>
+        </Modal.Footer>
+      </Modal>
+      <Modal show={uploadCodeToBoardMutation.isError} centered>
+        <Modal.Body>
+          <p>There was an error uploading your design to the board.</p>
+          <code>{uploadCodeToBoardMutation.error?.message}</code>
+        </Modal.Body>
+        <Modal.Footer>
+          <button
+            className="btn btn-primary"
+            onClick={() => uploadCodeToBoardMutation.reset()}
+          >
+            Close
+          </button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
