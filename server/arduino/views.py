@@ -112,7 +112,7 @@ class Demo(APIView):
 
 
 # @method_decorator(login_required, name="dispatch")
-@method_decorator(csrf_exempt, name="dispatch")
+# @method_decorator(csrf_exempt, name="dispatch")
 class ProjectListView(APIView):
     def get(self, request):
         """

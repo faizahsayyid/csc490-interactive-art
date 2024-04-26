@@ -68,7 +68,7 @@ class Actions:
                 "no input": ["fade_in_out", "blink"],
             },
             "led_strip": {
-                "input": ["motion_sense_to_led_strip"],
+                "input": ["led_strip_on_input_activation"],
                 "no input": [],
             },
             "speaker": [],

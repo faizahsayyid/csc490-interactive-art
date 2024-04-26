@@ -97,7 +97,7 @@ const DeviceModal: React.FC<DeviceModalProps> = ({
             toggleModal();
           }}
         >
-          Save Changes
+          Add
         </Button>
       </Modal.Footer>
     </Modal>

@@ -149,7 +149,7 @@ export const Flow: React.FC = () => {
               // @ts-ignore
               image: OUTPUT_DEVICE_IMAGES[outputDevice.device_name],
               description:
-              // @ts-ignore
+                // @ts-ignore
                 OUTPUT_DEVICE_INFO[outputDevice.device_name].description,
               type: "output",
             },
@@ -408,8 +408,8 @@ export const Flow: React.FC = () => {
   return (
     <div className="flow-container">
       {/* <button onClick={saveProject}>Save Project</button> */}
-      <div className="position-absolute top-12 start-0 ms-4 mt-2 p-3 bread top_bar">
-        <div className="top_bar">
+      <div className="position-absolute top-12 start-0 mt-2 p-3 bread top_bar w-100">
+        <div className="top_bar d-flex justify-content-between w-100 mx-3">
           <nav className="bread" aria-label="breadcrumb">
             <ol className="breadcrumb">
               <li className="breadcrumb-item" aria-current="page">
@@ -420,9 +420,12 @@ export const Flow: React.FC = () => {
               </li>
             </ol>
           </nav>
-          <div onClick={saveProject} className="top_button">
+          <button
+            onClick={saveProject}
+            className={`top_button btn btn-${saving ? "secondary" : "info"}`}
+          >
             {saving ? "Saved" : "Click to Save Project"}
-          </div>
+          </button>
         </div>
       </div>
 
