@@ -42,7 +42,6 @@ import axios from "axios";
 import { API_URL } from "../../api/config";
 
 // import axios from "axios";
-
 const start_y = 200;
 const y_step = 100;
 const input_x = 200;
@@ -115,31 +114,44 @@ export const Flow: React.FC = () => {
         console.log("Current project:", CurrentProject);
 
         const initialInputDevices = project.input_devices.map(
-          (inputDevice, index) => (
+          (inputDevice: any, index: number) => (
             console.log("Input Device:", inputDevice),
             {
-            id: uuidv4(),
-            type: "custom",
-            data: {
-              label: INPUT_DEVICE_INFO[inputDevice.device_name].name,
-              name: INPUT_DEVICE_INFO[inputDevice.device_name].name,
-              image: INPUT_DEVICE_IMAGES[inputDevice.device_name],
-              description: INPUT_DEVICE_INFO[inputDevice.device_name].description,
-              type: "input",
-            },
-            position: { x: input_x, y: start_y + y_step * index },
-          })
+              id: uuidv4(),
+              type: "custom",
+              data: {
+                // @ts-ignore
+                label: INPUT_DEVICE_INFO[inputDevice.device_name].name,
+                // @ts-ignore
+
+                name: INPUT_DEVICE_INFO[inputDevice.device_name].name,
+                // @ts-ignore
+
+                image: INPUT_DEVICE_IMAGES[inputDevice.device_name],
+                description:
+                  // @ts-ignore
+                  INPUT_DEVICE_INFO[inputDevice.device_name].description,
+                type: "input",
+              },
+              position: { x: input_x, y: start_y + y_step * index },
+            }
+          )
         );
 
         const initialOutputDevices = project.output_devices.map(
-          (outputDevice, index) => ({
+          (outputDevice: any, index: number) => ({
             id: uuidv4(),
             type: "custom",
             data: {
+              // @ts-ignore
               label: OUTPUT_DEVICE_INFO[outputDevice.device_name].name,
+              // @ts-ignore
               name: OUTPUT_DEVICE_INFO[outputDevice.device_name].name,
+              // @ts-ignore
               image: OUTPUT_DEVICE_IMAGES[outputDevice.device_name],
-              description: OUTPUT_DEVICE_INFO[outputDevice.device_name].description,
+              description:
+                // @ts-ignore
+                OUTPUT_DEVICE_INFO[outputDevice.device_name].description,
               type: "output",
             },
             position: { x: output_x, y: start_y + y_step * index },
@@ -153,49 +165,11 @@ export const Flow: React.FC = () => {
       });
   }, []);
 
-  // useEffect(() => {
-  //   // @TODO - Load project state from backend, modify loading logic
-  //   const initialInputDevices = project_example.inputDevices.map(
-  //     (inputDevice, index) => ({
-  //       id: uuidv4(),
-  //       type: "custom",
-  //       data: {
-  //         label: INPUT_DEVICE_INFO[inputDevice.device].name,
-  //         name: INPUT_DEVICE_INFO[inputDevice.device].name,
-  //         image: INPUT_DEVICE_IMAGES[inputDevice.device],
-  //         description: INPUT_DEVICE_INFO[inputDevice.device].description,
-  //         type: "input",
-  //       },
-  //       position: { x: input_x, y: start_y + y_step * index },
-  //     })
-  //   );
-
-  //   const initialOutputDevices = project_example.outputDevices.map(
-  //     (outputDevice, index) => ({
-  //       id: uuidv4(),
-  //       type: "custom",
-  //       data: {
-  //         label: OUTPUT_DEVICE_INFO[outputDevice.device].name,
-  //         name: OUTPUT_DEVICE_INFO[outputDevice.device].name,
-  //         image: OUTPUT_DEVICE_IMAGES[outputDevice.device],
-  //         description: OUTPUT_DEVICE_INFO[outputDevice.device].description,
-  //         type: "output",
-  //       },
-  //       position: { x: output_x, y: start_y + y_step * index },
-  //     })
-  //   );
-
-  //   setNodes([...initialInputDevices, ...initialOutputDevices]);
-  // }, []);
-
-  // @TODO - Load project state from backend
   const { projectId } = useParams();
   console.log("Project ID:", projectId);
 
-  // @JoshPugli change this to the actual project id
-  // const userID: string = "1";
-
   const [project, setProject] = useState<Project | null>(null);
+  const [saving, setSaving] = useState(false);
 
   const [currentConnection, setCurrentConnection] = useState<CurrentConnection>(
     { id: null, source: null, target: null }
@@ -224,12 +198,6 @@ export const Flow: React.FC = () => {
   }
 
   const [lastAddedEdge, setLastAddedEdge] = useState<any | null>(null);
-
-  // useEffect(() => {
-  //   if (interactions.length !== edges.length && !currentConnection.id) {
-  //     alert("Error: Interaction count does not match edge count");
-  //   }
-  // }, [interactions, edges]);
 
   useEffect(() => {
     // Delete interactions with no corresponding edge
@@ -390,19 +358,59 @@ export const Flow: React.FC = () => {
     setProject(CurrentProject);
   }, [nodes, edges, interactions]);
 
+  const saveProject = useCallback(() => {
+    if (!project) {
+      return;
+    }
+    changeSavingState();
+
+    console.log("Putting project to backend:", project);
+    axios
+      .put(`${API_URL}/arduino/projects/${projectId}/`, project, {
+        headers: {
+          Authorization: `${localStorage.getItem("token")}`,
+        },
+      })
+      .then((response) => {
+        console.log("Response:", response.data);
+      })
+      .catch((error) => {
+        console.error("Error in axios put:", error);
+      });
+  }, [project]);
+
+  const changeSavingState = useCallback(() => {
+    setSaving(true);
+    setTimeout(() => {
+      setSaving(false);
+    }, 1000);
+  }, []);
+
+  useEffect(() => {
+    saveProject(); // Automatically save when project changes
+  }, [project, saveProject]); // React on changes in project
+
   return (
     <div className="flow-container">
-      <div className="position-absolute top-12 start-0 ms-4 mt-2 p-3 bread">
-        <nav className="bread" aria-label="breadcrumb">
-          <ol className="breadcrumb">
-            <li className="breadcrumb-item" aria-current="page">
-              <Link to="/">Projects</Link>
-            </li>
-            <li className="breadcrumb-item active" aria-current="page">
-              {project && project.name}
-            </li>
-          </ol>
-        </nav>
+      {/* <button onClick={saveProject}>Save Project</button> */}
+      <div className="position-absolute top-12 start-0 ms-4 mt-2 p-3 bread top_bar">
+        <div className="top_bar">
+          <nav className="bread" aria-label="breadcrumb">
+            <ol className="breadcrumb">
+              <li className="breadcrumb-item" aria-current="page">
+                <Link to="/">Projects</Link>
+              </li>
+              <li className="breadcrumb-item active" aria-current="page">
+                {project && project.name}
+              </li>
+            </ol>
+          </nav>
+          {saving ? (
+            <div className="top_symbol">Saving...</div>
+          ) : (
+            <div className="top_symbol">Saved</div>
+          )}
+        </div>
       </div>
 
       <ReactFlow

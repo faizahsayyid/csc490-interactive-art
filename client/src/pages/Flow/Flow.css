@@ -61,3 +61,15 @@
 .delete-node-button:hover {
   color: red;
 }
+
+.top_symbol {
+  position: relative;
+  /* align-self: center; */
+  margin-left: 15px;
+  margin-top: 5px;
+}
+
+.top_bar {
+  display: flex;
+  flex-direction: row;
+}
