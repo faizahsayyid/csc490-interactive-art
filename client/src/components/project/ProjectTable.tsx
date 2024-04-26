@@ -7,7 +7,7 @@ type ProjectTableProps = {
 };
 
 export const ProjectTable: React.FC<ProjectTableProps> = ({ projects }) => {
-  console.log("proj_table_projs", projects);
+  // console.log("proj_table_projs", projects);
   if (!Array.isArray(projects)) {
     return <div>No projects available</div>;
   }

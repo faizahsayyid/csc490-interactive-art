@@ -10,7 +10,7 @@ type ProjectCardProps = {
 };
 
 const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
-  console.log("proj_card_proj", project);
+  // console.log("proj_card_proj", project);
   if (!project) {
     return <div>No projects available</div>;
   }

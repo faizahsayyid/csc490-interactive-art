@@ -168,6 +168,26 @@ export const Flow: React.FC = () => {
         }));
 
         setEdges(initialEdges);
+
+        const initialInteractions = project.interactions.map(
+          (interaction: InteractionFlow, index: number) => ({
+            id: initialEdges[index].id,
+            sourceDevice: initialInputDevices.find(
+              // @ts-ignore
+              (device) => device.id === interaction.input_device
+            ),
+            targetDevice: initialOutputDevices.find(
+              // @ts-ignore
+              (device) => device.id === interaction.output_device
+            ),
+            action: interaction.action,
+            // @ts-ignore
+            args: interaction.additional_variables,
+          })
+        );
+
+        setInteractions(initialInteractions);
+
       })
       .catch((error) => {
         console.error(error);
