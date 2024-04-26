@@ -3,9 +3,11 @@ import {
   InputDevicePinForm,
   OutputDevicePinForm,
 } from "../components/device/DevicePinForm";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { getProjectById } from "../api/project";
 import { useParams } from "react-router-dom";
+import { uploadCodeToBoard } from "../api/download";
+import { Modal, Spinner } from "react-bootstrap";
 
 export const ReviewDesign: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
@@ -14,6 +16,14 @@ export const ReviewDesign: React.FC = () => {
     queryKey: ["getProjectById", projectId],
     queryFn: () => getProjectById({ projectId }),
   });
+
+  const uploadCodeToBoardMutation = useMutation({
+    mutationFn: uploadCodeToBoard,
+  });
+
+  const onUploadCodeToBoard = async () => {
+    await uploadCodeToBoardMutation.mutateAsync(projectId as string);
+  };
 
   const project = projectQueryResult.data;
 
@@ -63,9 +73,45 @@ export const ReviewDesign: React.FC = () => {
           );
         })}
       </div>
-      <button className="btn btn-primary mt-5 ms-auto">
+      <button
+        className="btn btn-primary mt-5 ms-auto"
+        onClick={onUploadCodeToBoard}
+      >
         Upload Design To Board
       </button>
+      <Modal show={uploadCodeToBoardMutation.isPending} centered>
+        <Modal.Body>
+          <Spinner />
+          Uploading design to board...
+        </Modal.Body>
+      </Modal>
+      <Modal show={uploadCodeToBoardMutation.isSuccess} centered>
+        <Modal.Body>
+          Your design has been successfully uploaded to the board!
+        </Modal.Body>
+        <Modal.Footer>
+          <button
+            className="btn btn-primary"
+            onClick={() => uploadCodeToBoardMutation.reset()}
+          >
+            Close
+          </button>
+        </Modal.Footer>
+      </Modal>
+      <Modal show={uploadCodeToBoardMutation.isError} centered>
+        <Modal.Body>
+          <p>There was an error uploading your design to the board.</p>
+          <code>{uploadCodeToBoardMutation.error?.message}</code>
+        </Modal.Body>
+        <Modal.Footer>
+          <button
+            className="btn btn-primary"
+            onClick={() => uploadCodeToBoardMutation.reset()}
+          >
+            Close
+          </button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
