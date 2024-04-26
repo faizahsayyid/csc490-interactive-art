@@ -72,7 +72,8 @@ const DevicePinForm: React.FC<DevicePinFormProps> = ({
             type="number"
             name="pin"
             id="pin"
-            min={0}
+            min={2}
+            max={13}
             defaultValue={defaultPin}
           />
           <button className="btn btn-secondary" type="submit">

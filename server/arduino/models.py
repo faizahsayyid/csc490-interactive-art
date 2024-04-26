@@ -22,7 +22,7 @@ class InputDevice(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=True)
     project = models.ForeignKey(Project, related_name="input_devices", on_delete=models.CASCADE)
     device_name = models.CharField(max_length=255)
-    pin = models.IntegerField(default=1)
+    pin = models.IntegerField(default=3)
 
     def __str__(self):
         return self.device_name

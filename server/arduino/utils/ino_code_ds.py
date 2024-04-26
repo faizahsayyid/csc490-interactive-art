@@ -255,6 +255,9 @@ void loop() {{
 
             # TODO: Temporary code to test for single input, output for negate_output_on_input
             # Generate code based on action, and add to the code data structure
+
+            print(args, kwargs)
+
             global_code, setup_code, loop_code = self.actions.get_action_code(
                 action, input_pin, output_pin, *args, **kwargs
             )
