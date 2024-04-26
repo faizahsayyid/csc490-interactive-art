@@ -16,6 +16,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from .serializers import UserSerializer, RegisterSerializer, LoginUserSerializer, LogoutUserSerializer
 from rest_framework.authtoken.models import Token
+
 # from knox.models import AuthToken
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
@@ -40,19 +41,20 @@ class RegisterAPI(generics.GenericAPIView):
         return Response({"user": UserSerializer(user, context=self.get_serializer_context()).data, "token": token.key})
 
 
-class LoginAPI(generics.GenericAPIView):
-    permission_classes = [AllowAny]
-    serializer_class = LoginUserSerializer
+class LoginAPI(APIView):
+    permission_classes = (AllowAny,)
 
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            user = serializer.validated_data
-            token, _ = Token.objects.get_or_create(user=user)
-            user = authenticate(username=user.username, password=user.password)
+    def post(self, request):
+        username = request.data.get("email")
+        password = request.data.get("password")
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
             login(request, user)
-            return Response({"user": UserSerializer(user, context=self.get_serializer_context()).data, "token": token.key})
-        return Response({"error": "Invalid data"}, status=400)
+            # Assuming you are using Django's token framework
+            token, created = Token.objects.get_or_create(user=user)
+            return Response({"token": token.key}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Invalid Credentials"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LogoutAPI(generics.GenericAPIView):
