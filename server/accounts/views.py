@@ -24,6 +24,12 @@ from rest_framework.permissions import AllowAny
 
 # This is the module for account related features -- registeration, login, logout, delete, edit, etc.
 
+class TestLoggedIn(APIView):
+
+    def get(self, request):
+        if request.user.is_anonymous:
+            return JsonResponse({"message": "You are not logged in"}, status=200)
+        return JsonResponse({"message": "You are logged in"}, status=200)
 
 class RegisterAPI(generics.GenericAPIView):
     permission_classes = [AllowAny]
