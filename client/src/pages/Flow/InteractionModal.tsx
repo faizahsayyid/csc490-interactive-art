@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import axios from "axios";
 import { ActionVariable, ActionVariableType } from "../../types/action";
+import { ACTION_TO_DESCRIPTION, ACTION_TO_NAME, INTERACTION_COLOR_MAP, ARGS_TO_DESCRIPTION } from "./Constants";
 
 interface InteractionModalProps {
   showModal: boolean;
@@ -55,7 +56,7 @@ const InteractionModal: React.FC<InteractionModalProps> = ({
       axios
         .post("http://127.0.0.1:8000/arduino/actions/", requestBody)
         .then((response) => {
-          console.log("Response:", response.data);
+          console.log("Response actions:", response.data);
           setAllowedActions(response.data);
         })
         .catch((error) => {
@@ -132,9 +133,12 @@ const InteractionModal: React.FC<InteractionModalProps> = ({
               >
                 <option value="[select]">[select]</option>
                 {allowedActions.map((action, index) => (
-                  <option key={index}>{action}</option>
+                  // @ts-ignore
+                  <option key={index} value={action}>{ACTION_TO_NAME[action]}</option>
                 ))}
               </Form.Control>
+              {/* @ts-ignore */}
+              <span style={{color: `${INTERACTION_COLOR_MAP[selectedAction]}`}}>{selectedAction.name !== "[select]" && ACTION_TO_DESCRIPTION[selectedAction]}</span>
             </Form.Group>
           )}
           {selectedAction.name !== "[select]" &&
@@ -145,7 +149,8 @@ const InteractionModal: React.FC<InteractionModalProps> = ({
                 className="mb-2"
               >
                 <Form.Label>
-                  {action.name} ({`${action.type}`})
+                  {/* @ts-ignore */}
+                  {ARGS_TO_DESCRIPTION[action.name]} ({`${action.type}`})
                 </Form.Label>
                 <Form.Control
                   type={action.type}
