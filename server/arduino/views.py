@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.utils.decorators import method_decorator
-from .utils.ino_code_ds import inoCodeDataStructure
+from .utils.ino_code_ds import PortNotFoundError, inoCodeDataStructure
 from django.views import View
 from django.contrib.auth.decorators import login_required
 from .models import Project, InputDevice, OutputDevice, Interaction
@@ -59,6 +59,8 @@ class SendCodeToBoard(APIView):
             return Response(status=status.HTTP_200_OK, data={"code": str(code)})
         except AssertionError as ae:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "Assertion error: " + str(ae)})
+        except PortNotFoundError as pne:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": str(pne)})
         except Exception as e:
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data={"error": str(e)})
 

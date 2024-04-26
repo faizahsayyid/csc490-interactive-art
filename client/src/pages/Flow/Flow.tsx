@@ -114,7 +114,7 @@ export const Flow: React.FC = () => {
         console.log("Current project:", CurrentProject);
 
         const initialInputDevices = project.input_devices.map(
-          (inputDevice: any, index: number) => (
+          (inputDevice: DeviceConfig<InputDevice>, index: number) => (
             console.log("Input Device:", inputDevice),
             {
               id: uuidv4(),
@@ -123,14 +123,11 @@ export const Flow: React.FC = () => {
                 // @ts-ignore
                 label: INPUT_DEVICE_INFO[inputDevice.device_name].name,
                 // @ts-ignore
-
                 name: INPUT_DEVICE_INFO[inputDevice.device_name].name,
                 // @ts-ignore
-
                 image: INPUT_DEVICE_IMAGES[inputDevice.device_name],
-                description:
-                  // @ts-ignore
-                  INPUT_DEVICE_INFO[inputDevice.device_name].description,
+                // @ts-ignore
+                description: INPUT_DEVICE_INFO[inputDevice.device_name].description,
                 type: "input",
               },
               position: { x: input_x, y: start_y + y_step * index },
@@ -149,9 +146,8 @@ export const Flow: React.FC = () => {
               name: OUTPUT_DEVICE_INFO[outputDevice.device_name].name,
               // @ts-ignore
               image: OUTPUT_DEVICE_IMAGES[outputDevice.device_name],
-              description:
-                // @ts-ignore
-                OUTPUT_DEVICE_INFO[outputDevice.device_name].description,
+              // @ts-ignore
+              description: OUTPUT_DEVICE_INFO[outputDevice.device_name].description,
               type: "output",
             },
             position: { x: output_x, y: start_y + y_step * index },

@@ -5,6 +5,11 @@ import serial
 import serial.tools.list_ports
 from arduino.utils.actions import Actions
 
+class PortNotFoundError(Exception):
+    def __init__(self):
+        self.message = "No Arduino-compatible device found. Please connect your device."
+        super().__init__(self.message)
+
 class OutputDevice:
     def __init__(self, pin: int, input_device=None):
         assert 2 <= pin <= 13
@@ -87,9 +92,8 @@ void loop() {{
             if any(descriptor in port.description for descriptor in target_descriptors):
                 print(f"Arduino found on port: {port.device}")
                 return port.device
-        
-        print("No Arduino-compatible device found. Please connect your device.")
-        return None
+        # throw error
+        raise PortNotFoundError
 
     def __write_code_to_file(self, code: str, file_name: str):
         """
