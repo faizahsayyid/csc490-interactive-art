@@ -16,33 +16,42 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from .serializers import UserSerializer, RegisterSerializer, LoginUserSerializer, LogoutUserSerializer
 from rest_framework.authtoken.models import Token
-from knox.models import AuthToken
+# from knox.models import AuthToken
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny
 
 # This is the module for account related features -- registeration, login, logout, delete, edit, etc.
 
 
 class RegisterAPI(generics.GenericAPIView):
+    permission_classes = [AllowAny]
     serializer_class = RegisterSerializer
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
+        token, created = Token.objects.get_or_create(user=user)
+        # make sure this user is not anonymous
+        # login(request, user)
         login(request, user)
-        return Response({"user": UserSerializer(user, context=self.get_serializer_context()).data, "token": AuthToken.objects.create(user)[1]})
+        # By this call, the user is logged in
+        return Response({"user": UserSerializer(user, context=self.get_serializer_context()).data, "token": token.key})
 
 
 class LoginAPI(generics.GenericAPIView):
+    permission_classes = [AllowAny]
     serializer_class = LoginUserSerializer
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             user = serializer.validated_data
+            token, _ = Token.objects.get_or_create(user=user)
+            user = authenticate(username=user.username, password=user.password)
             login(request, user)
-            return Response({"user": UserSerializer(user, context=self.get_serializer_context()).data, "token": AuthToken.objects.create(user)[1]})
+            return Response({"user": UserSerializer(user, context=self.get_serializer_context()).data, "token": token.key})
         return Response({"error": "Invalid data"}, status=400)
 
 
@@ -51,6 +60,9 @@ class LogoutAPI(generics.GenericAPIView):
     # permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
+        if request.user.is_anonymous:
+            return Response({"error": "You are not logged in"}, status=200)
+        request.user.auth_token.delete()
         logout(request)
         return Response({"status": "Logged out"})
 
@@ -84,7 +96,6 @@ class Login(APIView):
 
 # This is the view for logout
 class Logout(APIView):
-    @method_decorator(csrf_exempt)
     def post(self, request):
         if request.user.is_anonymous:
             return JsonResponse({"message": "You are not logged in"}, status=200)
@@ -95,7 +106,6 @@ class Logout(APIView):
 
 # This is the view for editing an account
 class EditAccount(APIView):
-    @method_decorator(csrf_exempt)
     def put(self, request):
         data = json.loads(request.body)
         user = request.user

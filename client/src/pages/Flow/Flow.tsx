@@ -8,14 +8,14 @@ import ReactFlow, {
   useNodesState,
   useEdgesState,
 } from "reactflow";
-import { EXAMPLE_PROJECTS } from "../../constants/example-data";
+// import { EXAMPLE_PROJECTS } from "../../constants/example-data";
 // import { useParams } from "react-router-dom";
 import {
-  INPUT_DEVICE_INFO,
+  // INPUT_DEVICE_INFO,
   INPUT_DEVICE_IMAGES,
 } from "../../constants/device/input-device";
 import {
-  OUTPUT_DEVICE_INFO,
+  // OUTPUT_DEVICE_INFO,
   OUTPUT_DEVICE_IMAGES,
 } from "../../constants/device/output-device";
 import CustomNode from "./CustomNode";
@@ -39,7 +39,7 @@ import {
   OutputNodeToOutputDevice,
 } from "./utils";
 import axios from "axios";
-import { API_URL } from "../../api/config";
+// import { API_URL } from "../../api/config";
 
 // import axios from "axios";
 
