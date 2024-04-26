@@ -62,14 +62,16 @@
   color: red;
 }
 
-.top_symbol {
+.top_button {
   position: relative;
   /* align-self: center; */
   margin-left: 15px;
   margin-top: 5px;
+  cursor: pointer;
 }
 
 .top_bar {
   display: flex;
   flex-direction: row;
 }
+

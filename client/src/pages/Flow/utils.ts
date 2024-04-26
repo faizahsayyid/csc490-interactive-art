@@ -37,12 +37,14 @@ export const InputNodeToInputDevice = (device: any): DeviceConfig<InputDevice> =
   if (device.data.type === "input") {
     if (deviceType in InputDevice) {
       return {
+        // @ts-ignore
         device_name: deviceType,
         id: device.id,
       };
     } else {
       alert("Invalid input device type: " + deviceType);
       return {
+        // @ts-ignore
         device_name: InputDevice.BUTTON,
         id: device.id,
       };
@@ -50,6 +52,7 @@ export const InputNodeToInputDevice = (device: any): DeviceConfig<InputDevice> =
   } else {
     alert("Invalid device type: " + device.type);
     return {
+      // @ts-ignore
       device_name: InputDevice.BUTTON,
       id: device.id,
     };
@@ -61,12 +64,14 @@ export const OutputNodeToOutputDevice = (device: any): DeviceConfig<OutputDevice
   if (device.data.type === "output") {
     if (deviceType in OutputDevice) {
       return {
+        // @ts-ignore
         device_name: deviceType,
         id: device.id,
       };
     } else {
       alert("Invalid output device type: " + deviceType);
       return {
+        // @ts-ignore
         device_name: OutputDevice.LED_STRIP,
         id: device.id,
       };
@@ -74,6 +79,7 @@ export const OutputNodeToOutputDevice = (device: any): DeviceConfig<OutputDevice
   } else {
     alert("Invalid device type: " + device.type);
     return {
+      // @ts-ignore
       device_name: OutputDevice.LED_STRIP,
       id: device.id,
     };

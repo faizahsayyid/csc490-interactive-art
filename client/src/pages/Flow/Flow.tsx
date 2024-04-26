@@ -386,9 +386,9 @@ export const Flow: React.FC = () => {
     }, 1000);
   }, []);
 
-  useEffect(() => {
-    saveProject(); // Automatically save when project changes
-  }, [project, saveProject]); // React on changes in project
+  // useEffect(() => {
+  //   saveProject(); // Automatically save when project changes
+  // }, [nodes, edges, interactions]); // React on changes in project
 
   return (
     <div className="flow-container">
@@ -405,11 +405,9 @@ export const Flow: React.FC = () => {
               </li>
             </ol>
           </nav>
-          {saving ? (
-            <div className="top_symbol">Saving...</div>
-          ) : (
-            <div className="top_symbol">Saved</div>
-          )}
+          <div onClick={saveProject} className="top_button">
+            {saving ? "Saved" : "Click to Save Project"}
+            </div>
         </div>
       </div>
 
