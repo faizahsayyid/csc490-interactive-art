@@ -3,7 +3,7 @@ import subprocess
 import os
 import serial
 import serial.tools.list_ports
-from arduino.utils.actions import Actions
+from actions import Actions
 
 class PortNotFoundError(Exception):
     def __init__(self):
@@ -48,7 +48,10 @@ class inoCodeDataStructure:
 
         ### Arduino upload parameters ###
         self.port = self.__find_port()
-        self.board_type = "arduino:avr:nano"
+        # NANO
+        # self.board_type = "arduino:avr:nano"
+        # MEGA
+        self.board_type = "arduino:avr:mega"
         self.file_name = "my_sketch.ino"
 
         ### Internal devices ###
@@ -87,7 +90,7 @@ void loop() {{
         :return: Detected port device path, or a default one if not found
         """
         ports = serial.tools.list_ports.comports()
-        target_descriptors = ["CH340", "Arduino", "USB Serial"]  # Common identifiers for Arduino boards
+        target_descriptors = ["CH340", "Arduino", "USB Serial", "IOUSBHostDevice"]  # Common identifiers for Arduino boards
         for port in ports:
             if any(descriptor in port.description for descriptor in target_descriptors):
                 print(f"Arduino found on port: {port.device}")
@@ -263,6 +266,13 @@ if __name__ == "__main__":
     code = inoCodeDataStructure()
     # Any argument passed that is beyond the action string is passed as *args to the action function,
     # and is determined by the function header in actions.py
-    code.initialize_new_device_connection(11, [13], "negate_output_on_input", 1000)
+    # code.initialize_new_device_connection(2, [11], "negate_output_on_input")
+    # def __blink_on_input_activation(
+    #     self,
+    #     input_pin: int,
+    #     output_pin: int,
+    #     blink_duration: int = 1000,
+    #     after_action: int = 2,
+    code.initialize_new_device_connection(2, [11], "blink_then_off_on_input_activation", 3000)
     print(code)
-    # code.upload()
+    code.upload()

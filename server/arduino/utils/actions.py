@@ -17,6 +17,7 @@ class Actions:
             "fade_in_out": self.__fade_in_out,
             "blink": self.__blink,
             "led_strip_on_input_activation": self.__led_strip_on_input_activation,
+            "blink_then_off_on_input_activation": self.__blink_then_off_on_input_activation,
         }
 
         # TODO: Make sure all actions make sense
@@ -29,6 +30,7 @@ class Actions:
                 "blink_on_hold",
                 "blink_on_double_click",
                 "led_strip_on_input_activation",
+                "blink_then_off_on_input_activation",
             ],
             "light_sensor": [
                 "negate_output_on_input",
@@ -62,7 +64,7 @@ class Actions:
         # TODO: Currently temporary actions for simplicity
         self.output_device_actions = {
             "led": {
-                "input": ["negate_output_on_input"],
+                "input": ["negate_output_on_input", "blink_on_input_activation", "negate_output_on_double_click", "negate_output_on_hold", "blink_on_hold", "blink_on_double_click", "blink_then_off_on_input_activation"],
                 "no input": ["fade_in_out", "blink"],
             },
             "led_strip": {
@@ -150,14 +152,12 @@ class Actions:
             ],
         )
 
-    # TODO: rm delay
-    def __negate_output_on_input_activation(self, input_pin: int, output_pin: int, delay: int) -> tuple[list, list, list]:
+    def __negate_output_on_input_activation(self, input_pin: int, output_pin: int) -> tuple[list, list, list]:
         """
         Negates the output pin when the input pin is activated
         """
         input_pin = str(input_pin)
         output_pin = str(output_pin)
-        delay = str(delay)
         return (
             [],
             [],
@@ -169,7 +169,6 @@ class Actions:
                         f"digitalWrite({output_pin}, !outputState);",
                     ]
                 },
-                # f"delay({delay});",
             ],
         )
 
@@ -217,6 +216,62 @@ class Actions:
                         f"digitalWrite({output_pin}, {after_action});",
                     ]
                 },
+            ],
+        )
+    
+    def __blink_then_off_on_input_activation(
+        self,
+        input_pin: int,
+        output_pin: int,
+        blink_duration: int = 1000) -> tuple[list, list, list]:
+        """
+        Blinks the output pin for a duration then sets it to LOW when the input pin is activated
+        I.e., set it high for other times.
+
+        :param input_pin: The pin number of the input pin
+        :param output_pin: The pin number of the output pin
+        :param blink_duration: The duration to blink the output pin for
+        """
+        input_pin = str(input_pin)
+        output_pin = str(output_pin)
+        blink_duration = str(blink_duration)
+
+        return (
+            [
+                "int triggered = 0;"
+            ],
+            [],
+            [
+                f"int inputState = digitalRead({input_pin});",
+                {
+                    "if (triggered == 0 && inputState == LOW)": [
+                        f"digitalWrite({output_pin}, HIGH);",
+                    ]
+
+                },
+                {
+                    "if (inputState == HIGH)": [
+                        # Measure the time now
+                        f"unsigned long startTime = millis();",
+                        # Blink the output pin for the blink_duration
+                        {
+                            f"while (millis() - startTime < {blink_duration})": [
+                                f"digitalWrite({output_pin}, HIGH);",
+                                f"delay(100);",
+                                f"digitalWrite({output_pin}, LOW);",
+                                f"delay(100);",
+                            ]
+                        },
+                        f"digitalWrite({output_pin}, LOW);",
+                        "triggered = 1;"
+                    ]
+                },
+                {
+                    "if (triggered == 1)": [
+                        "delay(8000);",
+                        "triggered = 0;"
+                    ]
+                }
             ],
         )
 
@@ -344,7 +399,7 @@ class Actions:
                 },
             ],
         )
-
+    
     def __blink_on_double_click(
         self,
         input_pin: int,
@@ -397,7 +452,7 @@ class Actions:
                 },
             ],
         )
-
+    
     # MOTION SENSOR -> LED STRIP
     def __led_strip_on_input_activation(self, input_pin: int, output_pin: int, color: str = "White") -> tuple[list, list, list]:
         """
