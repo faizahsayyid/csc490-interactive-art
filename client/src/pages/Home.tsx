@@ -3,6 +3,7 @@ import { ProjectTable } from "../components/project/ProjectTable";
 import { Link } from "react-router-dom";
 import { Project } from "../types/project";
 import { getProjects } from "../api/project";
+import axios from "axios";
 
 export const Home: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -11,11 +12,28 @@ export const Home: React.FC = () => {
     const token = localStorage.getItem("token");
     if (token) {
       getProjects(token).then((data) => {
-        setProjects(data);
+        // @ts-ignore
+        console.log(data.data);
+        // @ts-ignore
+        setProjects(data.data);
       });
     }
-  }
-  , []);
+  }, []);
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:8000/accounts/test/", {
+        headers: {
+          Authorization: `Token ${localStorage.getItem("token")}`,
+        },
+      })
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, []);
 
   console.log("token: ", localStorage.getItem("token"));
 

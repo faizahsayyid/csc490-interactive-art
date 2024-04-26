@@ -10,15 +10,34 @@ type ProjectCardProps = {
 };
 
 const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
+  console.log("proj_card_proj", project);
+  if (!project) {
+    return <div>No projects available</div>;
+  }
   const id = project.id;
   const name = project.name;
   const lastModifiedFormatted = moment(project.lastModified).fromNow();
-  const inputDeviceNames = project.inputDevices
-    .map((deviceConfig) => INPUT_DEVICE_INFO[deviceConfig.device].name)
-    .join(", ");
-  const outputDeviceNames = project.outputDevices
-    .map((deviceConfig) => OUTPUT_DEVICE_INFO[deviceConfig.device].name)
-    .join(", ");
+
+  let inputDeviceNames = "None currently";
+  let outputDeviceNames = "None currently";
+
+  if (Array.isArray(project.inputDevices)) {
+    inputDeviceNames = project.inputDevices
+      .map((deviceConfig) => INPUT_DEVICE_INFO[deviceConfig.device].name)
+      .join(", ");
+  }
+  if (Array.isArray(project.outputDevices)) {
+    outputDeviceNames = project.outputDevices
+      .map((deviceConfig) => OUTPUT_DEVICE_INFO[deviceConfig.device].name)
+      .join(", ");
+  }
+  
+  // const inputDeviceNames = project.inputDevices
+  //   .map((deviceConfig) => INPUT_DEVICE_INFO[deviceConfig.device].name)
+  //   .join(", ");
+  // const outputDeviceNames = project.outputDevices
+  //   .map((deviceConfig) => OUTPUT_DEVICE_INFO[deviceConfig.device].name)
+  //   .join(", ");
 
   return (
     <tr>

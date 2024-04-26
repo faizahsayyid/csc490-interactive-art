@@ -76,7 +76,7 @@ export const Flow: React.FC = () => {
 
   // @JoshPugli change this to the actual project id
   const projectId: string = "1";
-  const userID: string = "1";
+  // const userID: string = "1";
 
   const [project, setProject] = useState<Project | null>(null);
 

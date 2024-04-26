@@ -14,6 +14,7 @@ export const Login = () => {
         email,
         password,
       });
+      
       localStorage.setItem("token", response.data.token);
       window.location.href = "/";
     } catch (error) {
