@@ -3,7 +3,8 @@ import subprocess
 import os
 import serial
 import serial.tools.list_ports
-from actions import Actions
+from arduino.utils.actions import Actions
+
 
 class PortNotFoundError(Exception):
     def __init__(self):
