@@ -8,6 +8,11 @@ import { getProjectById } from "../api/project";
 import { useParams } from "react-router-dom";
 import { uploadCodeToBoard } from "../api/download";
 import { Modal, Spinner } from "react-bootstrap";
+import {
+  ACTION_TO_NAME,
+  ACTION_TO_DESCRIPTION,
+  INTERACTION_COLOR_MAP,
+} from "./Flow/Constants";
 
 export const ReviewDesign: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
@@ -53,8 +58,20 @@ export const ReviewDesign: React.FC = () => {
             <div key={i} className="list-group-item p-3">
               <h3 className="h5">
                 <b className="fw-bold">Interaction {i + 1}:</b>{" "}
-                {interaction.action_key}
+                <span
+                  style={{
+                    // @ts-ignore
+                    color: `${INTERACTION_COLOR_MAP[interaction.action_key]}`,
+                  }}
+                >
+                  {/* @ts-ignore */}
+                  {ACTION_TO_NAME[interaction.action_key]}
+                </span>
               </h3>
+              <span style={{ color: "gray" }}>
+                {/* @ts-ignore */}
+                {ACTION_TO_DESCRIPTION[interaction.action_key]}
+              </span>
               <h4 className="h6 fw-bold mt-4">Input Device</h4>
               <InputDevicePinForm
                 projectId={projectId as string}

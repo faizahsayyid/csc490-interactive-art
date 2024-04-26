@@ -41,23 +41,13 @@ import {
 import axios from "axios";
 import { API_URL } from "../../api/config";
 import Legend from "./Legend";
+import { INTERACTION_COLOR_MAP } from "./Constants";
 
 // import axios from "axios";
 const start_y = 200;
 const y_step = 100;
 const input_x = 200;
 const output_x = 800;
-
-const INTERACTION_COLOR_MAP: object = {
-  "negate_output_on_input": "#e57373",  // Red
-  "blink_on_input_activation": "#64b5f6",  // Blue
-  "negate_output_on_double_click": "#81c784",  // Green
-  "negate_output_on_hold": "#ba68c8",  // Purple
-  "blink_on_hold": "#ffb74d",  // Orange
-  "blink_on_double_click": "#fff176",  // Yellow
-  "led_strip_on_input_activation": "#f06292",  // Pink
-  "blink_then_off_on_input_activation": "#a1887f",  // Brown
-}
 
 
 const nodeTypes = {

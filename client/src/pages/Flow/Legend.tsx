@@ -1,3 +1,5 @@
+import {ACTION_TO_NAME} from "./Constants";
+
 // @ts-ignore
 const Legend = ({ interactionColorMap, interactionNames }) => {
     let opactityVal:number = 0.3;
@@ -35,7 +37,7 @@ const Legend = ({ interactionColorMap, interactionNames }) => {
             }}
           ></div>
           {/* @ts-ignore */}
-          <div style={{color: "#fff"}}>{name}</div>
+          <div style={{color: "#fff"}}>{ACTION_TO_NAME[name]}</div>
         </div>
       ))}
     </div>
