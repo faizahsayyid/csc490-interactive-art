@@ -19,7 +19,7 @@ urlpatterns = [
     path('api/', SendCodeToBoard.as_view()),
     path('demo/', Demo.as_view()),
     path('projects/', ProjectListView.as_view()),
-    path('projects/<int:project_id>/', ProjectDetailView.as_view()),
+    path('projects/<int:project_id>/', ProjectDetailView.as_view(), name='project-detail'),
     path('actions/', GetActionsForDevices.as_view()),
     path('action-params/', GetRequiredAdditionalParamsForActions.as_view()),
     path('projects/<int:project_id>/input-devices/', InputDeviceListView.as_view()),

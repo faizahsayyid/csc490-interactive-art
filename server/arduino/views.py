@@ -111,7 +111,7 @@ class Demo(APIView):
 
 # @method_decorator(login_required, name="dispatch")
 @method_decorator(csrf_exempt, name="dispatch")
-class ProjectListView(View):
+class ProjectListView(APIView):
     def get(self, request):
         """
         Get a list of all projects owned by the user
@@ -159,19 +159,29 @@ class ProjectListView(View):
 
 # EndPoint: /project/<project_id>
 # @method_decorator(login_required, name="dispatch")
-@method_decorator(csrf_exempt, name="dispatch")
-class ProjectDetailView(View):
+# @method_decorator(csrf_exempt, name="dispatch")
+class ProjectDetailView(APIView):
     def get(self, request, project_id):
         """
-        Get details of a specific project
+        Get details of a specific project owned by the logged-in user.
         """
+        auth_token = request.headers.get("Authorization")
+        if not auth_token:
+            return JsonResponse({"error": "Authorization token not provided"}, status=401)
+
         try:
-            project = Project.objects.get(id=project_id, owner=User.objects.filter(auth_token=(request.headers.get("Authorization"))).first())
+            user = User.objects.filter(auth_token=auth_token).first()
+            if not user:
+                return JsonResponse({"error": "User not found"}, status=404)
+
+            project = Project.objects.get(id=project_id, owner=user)
             serializer = ProjectSerializer(project)
-            return JsonResponse(serializer.data)
+            return JsonResponse(serializer.data, safe=False)
         except Project.DoesNotExist:
             return JsonResponse({"error": "Project not found"}, status=404)
-
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+        
     def delete(self, request, project_id):
         """
         Delete a project
