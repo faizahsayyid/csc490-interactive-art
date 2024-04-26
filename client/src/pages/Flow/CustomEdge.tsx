@@ -27,6 +27,7 @@ export default function CustomEdge({
   style = {},
   markerEnd,
   onDelete, // Accept the onDelete function as a prop
+  data={color: "grey"},
 }: EdgeProps & { onDelete: (id: string) => void }) {
   // const { setEdges } = useReactFlow();
   const [edgePath, labelX, labelY] = getBezierPath({
@@ -38,13 +39,15 @@ export default function CustomEdge({
     targetPosition,
   });
 
+  const edgeColor = data.color;
+
   const onEdgeClick = () => {
     onDelete(id); 
   };
 
   return (
     <>
-      <BaseEdge path={edgePath} markerEnd={markerEnd} style={style} />
+      <BaseEdge path={edgePath} markerEnd={markerEnd} style={{ ...style, stroke: edgeColor }} />
       <EdgeLabelRenderer>
         <div
           style={{

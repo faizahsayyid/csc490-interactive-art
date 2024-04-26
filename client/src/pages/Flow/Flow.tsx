@@ -40,12 +40,24 @@ import {
 } from "./utils";
 import axios from "axios";
 import { API_URL } from "../../api/config";
+import Legend from "./Legend";
 
 // import axios from "axios";
 const start_y = 200;
 const y_step = 100;
 const input_x = 200;
 const output_x = 800;
+
+const INTERACTION_COLOR_MAP: object = {
+  "negate_output_on_input": "red",
+  "blink_on_input_activation": "blue",
+  "negate_output_on_double_click": "green",
+  "negate_output_on_hold": "purple",
+  "blink_on_hold": "orange",
+  "blink_on_double_click": "yellow",
+  "led_strip_on_input_activation": "pink",
+  "blink_then_off_on_input_activation": "brown",
+}
 
 const nodeTypes = {
   custom: CustomNode,
@@ -165,6 +177,10 @@ export const Flow: React.FC = () => {
           source: interaction.input_device,
           target: interaction.output_device,
           type: "custom",
+          data: {
+            // @ts-ignore
+            color: INTERACTION_COLOR_MAP[interaction.action]  // Assign color based on mapped interaction name
+          }
         }));
 
         setEdges(initialEdges);
@@ -204,6 +220,9 @@ export const Flow: React.FC = () => {
     { id: null, source: null, target: null }
   );
   const [interactions, setInteractions] = useState<InteractionFlow[]>([]);
+  // Set of all interation names
+  const interactionNames = new Set(interactions.map((interaction) => interaction.action));
+  console.log("Interaction names:", interactionNames);
 
   const [showDeviceModal, setShowDeviceModal] = useState(false);
   const [showInteractionModal, setShowInteractionModal] = useState(false);
@@ -313,10 +332,25 @@ export const Flow: React.FC = () => {
     action: ActionVariable,
     args: Record<string, any>
   ) => {
+    const actionColor = INTERACTION_COLOR_MAP[action]
+    console.log("Action color:", actionColor);
+
     setInteractions([
       ...interactions,
       { id, sourceDevice, targetDevice, action, args },
     ]);
+
+    setEdges(prevEdges => {
+      const updatedEdges = prevEdges.map(edge => {
+        if (edge.id === id) {
+          // Ensure to spread existing data and only update the color
+          return { ...edge, data: { ...edge.data, color: actionColor } };
+        }
+        return edge;
+      });
+      return updatedEdges;
+    });
+
     toggleInteractionModal();
     setCurrentConnection({ id: null, source: null, target: null });
   };
@@ -427,7 +461,7 @@ export const Flow: React.FC = () => {
 
   return (
     <div className="flow-container">
-      {/* <button onClick={saveProject}>Save Project</button> */}
+            <Legend interactionColorMap={INTERACTION_COLOR_MAP} interactionNames={interactionNames} />
       <div className="position-absolute top-12 start-0 mt-2 p-3 bread top_bar w-100">
         <div className="top_bar d-flex justify-content-between w-100 mx-3">
           <nav className="bread" aria-label="breadcrumb">
