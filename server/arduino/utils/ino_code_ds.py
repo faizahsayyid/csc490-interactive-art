@@ -50,9 +50,9 @@ class inoCodeDataStructure:
         ### Arduino upload parameters ###
         self.port = self.__find_port()
         # NANO
-        # self.board_type = "arduino:avr:nano"
+        self.board_type = "arduino:avr:nano"
         # MEGA
-        self.board_type = "arduino:avr:mega"
+        # self.board_type = "arduino:avr:mega"
         self.file_name = "my_sketch.ino"
 
         ### Internal devices ###

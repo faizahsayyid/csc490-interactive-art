@@ -4,6 +4,7 @@ import { getProjects } from "../api/project";
 import axios from "axios";
 import { CreateProjectModal } from "../components/project/CreateProjectModal";
 import { Project } from "../types/project";
+import { API_URL } from "../api/config";
 
 export const Home: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -22,7 +23,7 @@ export const Home: React.FC = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8000/accounts/test/", {
+      .get(`${API_URL}/accounts/test/`, {
         headers: {
           Authorization: `Token ${localStorage.getItem("token")}`,
         },
@@ -34,7 +35,7 @@ export const Home: React.FC = () => {
         console.error(error);
       });
   }, []);
-  
+
   const [showNewProjectModal, setShowNewProjectModal] = useState(false);
 
   console.log("token: ", localStorage.getItem("token"));

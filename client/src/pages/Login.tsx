@@ -1,20 +1,21 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { API_URL } from "../api/config";
 
 export const Login = () => {
-
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const email = (document.getElementById("email") as HTMLInputElement).value;
-    const password = (document.getElementById("password") as HTMLInputElement).value;
+    const password = (document.getElementById("password") as HTMLInputElement)
+      .value;
 
     try {
-      const response = await axios.post("http://localhost:8000/accounts/login/", {
+      const response = await axios.post(`${API_URL}/accounts/login/`, {
         email,
         password,
       });
-      
+
       localStorage.setItem("token", response.data.token);
       window.location.href = "/";
     } catch (error) {

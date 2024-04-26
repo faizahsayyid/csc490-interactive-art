@@ -1,7 +1,7 @@
-
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../api/config";
 
 export const SignUp = () => {
   const navigate = useNavigate();
@@ -10,7 +10,8 @@ export const SignUp = () => {
     event.preventDefault();
     const email = (event.target as HTMLFormElement).email.value;
     const password = (event.target as HTMLFormElement).password.value;
-    const confirmPassword = (event.target as HTMLFormElement).confirmPassword.value;
+    const confirmPassword = (event.target as HTMLFormElement).confirmPassword
+      .value;
 
     if (password !== confirmPassword) {
       alert("Passwords do not match");
@@ -18,7 +19,7 @@ export const SignUp = () => {
     }
 
     try {
-      const response = await axios.post("http://localhost:8000/accounts/register/", {
+      const response = await axios.post(`${API_URL}/accounts/register/`, {
         username: email,
         email,
         password,
@@ -36,16 +37,13 @@ export const SignUp = () => {
         if (data.password) {
           alert(`Password: ${data["password"]}`);
         }
-
       } else {
         localStorage.setItem("token", data.token);
         navigate("/");
       }
-
     } catch (error) {
       console.error("Error in axios post:", error);
     }
-
   };
 
   return (
