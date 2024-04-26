@@ -1,6 +1,5 @@
 // @ts-ignore
 const Legend = ({ interactionColorMap, interactionNames }) => {
-    console.log(interactionColorMap, interactionNames);
   return (
     <div
       style={{
@@ -13,6 +12,7 @@ const Legend = ({ interactionColorMap, interactionNames }) => {
         boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
       }}
     >
+        
       {Array.from(interactionNames).map((name) => (
         <div
         // @ts-ignore
@@ -21,7 +21,7 @@ const Legend = ({ interactionColorMap, interactionNames }) => {
         >
           <div
             style={{
-              width: "20px",
+              width: "40px",
               height: "2px",
               borderRadius: "50%",
               // @ts-ignore

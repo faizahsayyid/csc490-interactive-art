@@ -49,15 +49,16 @@ const input_x = 200;
 const output_x = 800;
 
 const INTERACTION_COLOR_MAP: object = {
-  "negate_output_on_input": "red",
-  "blink_on_input_activation": "blue",
-  "negate_output_on_double_click": "green",
-  "negate_output_on_hold": "purple",
-  "blink_on_hold": "orange",
-  "blink_on_double_click": "yellow",
-  "led_strip_on_input_activation": "pink",
-  "blink_then_off_on_input_activation": "brown",
+  "negate_output_on_input": "#e57373",  // Red
+  "blink_on_input_activation": "#64b5f6",  // Blue
+  "negate_output_on_double_click": "#81c784",  // Green
+  "negate_output_on_hold": "#ba68c8",  // Purple
+  "blink_on_hold": "#ffb74d",  // Orange
+  "blink_on_double_click": "#fff176",  // Yellow
+  "led_strip_on_input_activation": "#f06292",  // Pink
+  "blink_then_off_on_input_activation": "#a1887f",  // Brown
 }
+
 
 const nodeTypes = {
   custom: CustomNode,
@@ -332,8 +333,8 @@ export const Flow: React.FC = () => {
     action: ActionVariable,
     args: Record<string, any>
   ) => {
+    //@ts-ignore
     const actionColor = INTERACTION_COLOR_MAP[action]
-    console.log("Action color:", actionColor);
 
     setInteractions([
       ...interactions,
