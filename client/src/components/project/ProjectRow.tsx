@@ -21,17 +21,25 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
   let inputDeviceNames = "None currently";
   let outputDeviceNames = "None currently";
 
-  if (Array.isArray(project.inputDevices)) {
-    inputDeviceNames = project.inputDevices
-      .map((deviceConfig) => INPUT_DEVICE_INFO[deviceConfig.device].name)
+  console.log("project.inputDevices", project);
+
+  // @ts-ignore
+  if (Array.isArray(project.input_devices)) {
+    // @ts-ignore
+    inputDeviceNames = project.input_devices
+      // @ts-ignore
+      .map((deviceConfig) => INPUT_DEVICE_INFO[deviceConfig.device_name].name)
       .join(", ");
   }
-  if (Array.isArray(project.outputDevices)) {
-    outputDeviceNames = project.outputDevices
-      .map((deviceConfig) => OUTPUT_DEVICE_INFO[deviceConfig.device].name)
+  // @ts-ignore
+  if (Array.isArray(project.output_devices)) {
+    // @ts-ignore
+    outputDeviceNames = project.output_devices
+      // @ts-ignore
+      .map((deviceConfig) => OUTPUT_DEVICE_INFO[deviceConfig.device_name].name)
       .join(", ");
   }
-  
+
   // const inputDeviceNames = project.inputDevices
   //   .map((deviceConfig) => INPUT_DEVICE_INFO[deviceConfig.device].name)
   //   .join(", ");
