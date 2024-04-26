@@ -213,8 +213,7 @@ class ProjectDetailView(APIView):
                 project.name = project_name
                 project.save()
 
-            # if the user is trying to edit the input devices
-            # If the user is trying to replace the input devices
+
             if "inputDevices" in data:
                 # Delete all existing input devices associated with this project
                 project.input_devices.all().delete()
@@ -222,11 +221,9 @@ class ProjectDetailView(APIView):
                 # Create new input devices from provided data
                 input_devices = data.get("inputDevices", [])
                 for device in input_devices:
-                    # Remove the 'id' key if it exists as it's not needed for new creation
                     device.pop("id", None)
                     InputDevice.objects.create(project=project, **device)
 
-            # If the user is trying to replace the output devices
             if "outputDevices" in data:
                 # Delete all existing output devices associated with this project
                 project.output_devices.all().delete()
@@ -234,42 +231,43 @@ class ProjectDetailView(APIView):
                 # Create new output devices from provided data
                 output_devices = data.get("outputDevices", [])
                 for device in output_devices:
-                    # Remove the 'id' key if it exists as it's not needed for new creation
                     device.pop("id", None)
                     OutputDevice.objects.create(project=project, **device)
 
-            # if the user is trying to edit the interactions
+
             if "interactions" in data:
                 interactions = data.get("interactions", [])
+
+                # Clear all existing interactions for the project
+                project.interactions.all().delete()
+
+                # Add new interactions from provided data
                 for interaction in interactions:
 
                     # check if input_device exists in database
-                    input_device_id = interaction.get("input_device", None)
-                    input_device = InputDevice.objects.get(id=input_device_id)
-                    if not input_device:
+                    input_device = interaction.get("inputDeviceConfig", None)
+                    input_device_id = input_device.get("id", None)
+                    try:
+                        input_device = InputDevice.objects.get(id=input_device_id)
+                    except InputDevice.DoesNotExist:
                         return JsonResponse({"error": f"Input device with id {input_device_id} does not exist"}, status=400)
                     
                     # check if output_device exists in database
-                    output_device_id = interaction.get("output_device", None)
-                    output_device = OutputDevice.objects.get(id=output_device_id)
-                    if not output_device:
+                    output_device = interaction.get("outputDeviceConfig", None)
+                    output_device_id = output_device.get("id", None)
+                    try:
+                        output_device = OutputDevice.objects.get(id=output_device_id)
+                    except OutputDevice.DoesNotExist:
                         return JsonResponse({"error": f"Output device with id {output_device_id} does not exist"}, status=400)
 
-                    interaction_id = interaction.get("id", None)
-                    existing_interaction = Interaction.objects.filter(id=interaction_id).first()
-
-                    if "id" in interaction and existing_interaction:
-                        existing_interaction.input_device.set(input_device)
-                        existing_interaction.output_device.set(output_device)
-                        existing_interaction.action = interaction.get("action", existing_interaction.action)
-                        existing_interaction.additional_variables = interaction.get("additional_variables", existing_interaction.additional_variables)
-                        existing_interaction.save()
-                    else:
-                        if "id" in interaction:
-                            interaction.pop("id")
-                        interaction.pop("input_device")
-                        interaction.pop("output_device")
-                        Interaction.objects.create(project=project, input_device=input_device, output_device=output_device, **interaction)
+                    # Create the new interaction
+                    Interaction.objects.create(
+                        project=project, 
+                        input_device=input_device, 
+                        output_device=output_device, 
+                        action=interaction.get("action_key", ""),
+                        additional_variables=interaction.get("additionalVariables", {})
+                    )
         
             serializer = ProjectSerializer(project)
             return JsonResponse(serializer.data)
