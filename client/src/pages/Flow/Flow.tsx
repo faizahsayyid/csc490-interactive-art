@@ -101,6 +101,7 @@ export const Flow: React.FC = () => {
         let inputDevices = project.input_devices;
         let outputDevices = project.output_devices;
         let interactions = project.interactions;
+        console.log("initial interactions:", interactions);
         let lastModified = project.lastModified;
         let CurrentProject: Project = {
           id: projectID,
@@ -117,7 +118,7 @@ export const Flow: React.FC = () => {
           (inputDevice: DeviceConfig<InputDevice>, index: number) => (
             console.log("Input Device:", inputDevice),
             {
-              id: uuidv4(),
+              id: inputDevice.id,
               type: "custom",
               data: {
                 // @ts-ignore
@@ -137,7 +138,7 @@ export const Flow: React.FC = () => {
 
         const initialOutputDevices = project.output_devices.map(
           (outputDevice: any, index: number) => ({
-            id: uuidv4(),
+            id: outputDevice.id,
             type: "custom",
             data: {
               // @ts-ignore
@@ -155,6 +156,16 @@ export const Flow: React.FC = () => {
         );
 
         setNodes([...initialInputDevices, ...initialOutputDevices]);
+        
+        // @ts-ignore
+        const initialEdges = project.interactions.map(interaction => ({
+          id: uuidv4(),  
+          source: interaction.input_device,  
+          target: interaction.output_device,
+          type: 'custom',  
+        }));
+    
+        setEdges(initialEdges);
       })
       .catch((error) => {
         console.error(error);
