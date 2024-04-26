@@ -202,6 +202,8 @@ class ProjectDetailView(APIView):
         try:
             project = Project.objects.get(id=project_id, owner=User.objects.filter(auth_token=(request.headers.get("Authorization"))).first())
             data = json.loads(request.body)
+            
+            print("data ", data)
 
             # if the user is trying to edit the project name
             if "name" in data:
@@ -212,32 +214,29 @@ class ProjectDetailView(APIView):
                 project.save()
 
             # if the user is trying to edit the input devices
-            if "input_devices" in data:
-                input_devices = data.get("input_devices", [])
+            # If the user is trying to replace the input devices
+            if "inputDevices" in data:
+                # Delete all existing input devices associated with this project
+                project.input_devices.all().delete()
+
+                # Create new input devices from provided data
+                input_devices = data.get("inputDevices", [])
                 for device in input_devices:
-                    device_id = device.get("id")
-                    existing_device = project.input_devices.filter(id=device_id).first()
-                    if "id" in device and existing_device:
-                        existing_device.pin = device.get("pin", existing_device.pin)
-                        existing_device.save()
-                    else:
-                        if "id" in device:
-                            device.pop("id")
-                        InputDevice.objects.create(project=project, **device)
-            
-            # if the user is trying to edit the output devices
-            if "output_devices" in data:
-                output_devices = data.get("output_devices", [])
+                    # Remove the 'id' key if it exists as it's not needed for new creation
+                    device.pop("id", None)
+                    InputDevice.objects.create(project=project, **device)
+
+            # If the user is trying to replace the output devices
+            if "outputDevices" in data:
+                # Delete all existing output devices associated with this project
+                project.output_devices.all().delete()
+
+                # Create new output devices from provided data
+                output_devices = data.get("outputDevices", [])
                 for device in output_devices:
-                    device_id = device.get("id")
-                    existing_device = project.output_devices.filter(id=device_id).first()
-                    if "id" in device and existing_device:
-                        existing_device.pin = device.get("pin", existing_device.pin)
-                        existing_device.save()
-                    else:
-                        if "id" in device:
-                            device.pop("id")
-                        OutputDevice.objects.create(project=project, **device)
+                    # Remove the 'id' key if it exists as it's not needed for new creation
+                    device.pop("id", None)
+                    OutputDevice.objects.create(project=project, **device)
 
             # if the user is trying to edit the interactions
             if "interactions" in data:
