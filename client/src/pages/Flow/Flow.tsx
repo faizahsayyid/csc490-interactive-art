@@ -248,14 +248,14 @@ export const Flow: React.FC = () => {
 
   const [lastAddedEdge, setLastAddedEdge] = useState<any | null>(null);
 
-  // useEffect(() => {
-  //   // Delete interactions with no corresponding edge
-  //   setInteractions((prevInteractions) =>
-  //     prevInteractions.filter((interaction) =>
-  //       edges.some((edge) => edge.id === interaction.id)
-  //     )
-  //   );
-  // }, [edges]);
+  useEffect(() => {
+    // Delete interactions with no corresponding edge
+    setInteractions((prevInteractions) =>
+      prevInteractions.filter((interaction) =>
+        edges.some((edge) => edge.id === interaction.id)
+      )
+    );
+  }, [edges]);
 
   useEffect(() => {
     const updateSize = () => {

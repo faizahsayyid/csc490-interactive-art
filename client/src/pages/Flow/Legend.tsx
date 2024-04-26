@@ -1,18 +1,23 @@
 // @ts-ignore
 const Legend = ({ interactionColorMap, interactionNames }) => {
+    let opactityVal:number = 0.3;
+
+    console.log(interactionNames.size);
+    if (interactionNames.size === 0) {
+        opactityVal = 0;
+    }
   return (
     <div
       style={{
         position: "absolute",
         bottom: 20,
         left: 20,
-        backgroundColor: "rgba(100, 100, 100, 0.3)", // Grey background with 50% opacity
+        backgroundColor: `rgba(100, 100, 100, ${opactityVal})`, // Grey background with 50% opacity
         padding: "10px",
         borderRadius: "5px",
         boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
       }}
     >
-        
       {Array.from(interactionNames).map((name) => (
         <div
         // @ts-ignore
