@@ -22,13 +22,12 @@ PYTHON_TO_TS_ACTION_TYPE_MAP = {"int": "number", "bool": "boolean"}
 
 # @method_decorator(csrf_exempt, name="dispatch")
 class SendCodeToBoard(APIView):
-    def post(self, request, *args, **kwargs):
+    def post(self, request, project_id):
         try:
             print(request.data)
             code = inoCodeDataStructure()
             # Data is a list of lists of form: [input_pin: Optional[int], output_pins: List[int], action: str, *args: list]
             # Each list represents some connection between device (solo output, or input -> output(s))
-            project_id = request.data.get("project_id")
             project = Project.objects.get(id=project_id)
             # Assume project has been created with all required information
             for interaction in Interaction.objects.filter(project=project):
@@ -46,11 +45,9 @@ class SendCodeToBoard(APIView):
                     return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "output_pins must be a list of integers."})
                 if not isinstance(action_str, str):
                     return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "action must be a string."})
-                if not isinstance(arguments, list):
-                    return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "arguments must be a list."})
                 
                 # Initialize the connection between the input and output devices
-                code.initialize_new_device_connection(input_pin, output_pins, action_str, arguments)
+                code.initialize_new_device_connection(input_pin, output_pins, action_str, **arguments)
 
             try:    
                 code.upload()
@@ -58,6 +55,7 @@ class SendCodeToBoard(APIView):
                 return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": f"Failed to upload code to board.\ncode: {str(code)}\nError:{str(e)}"})
             return Response(status=status.HTTP_200_OK, data={"code": str(code)})
         except AssertionError as ae:
+            print(ae.with_traceback())
             return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "Assertion error: " + str(ae)})
         except PortNotFoundError as pne:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": str(pne)})

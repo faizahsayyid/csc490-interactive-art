@@ -81,8 +81,10 @@ export const ReviewDesign: React.FC = () => {
       </button>
       <Modal show={uploadCodeToBoardMutation.isPending} centered>
         <Modal.Body>
-          <Spinner />
-          Uploading design to board...
+          <div className="d-flex align-items-center justify-content-center gap-3">
+            <Spinner />
+            <p className="p-0 m-0">Uploading design to board...</p>
+          </div>
         </Modal.Body>
       </Modal>
       <Modal show={uploadCodeToBoardMutation.isSuccess} centered>
