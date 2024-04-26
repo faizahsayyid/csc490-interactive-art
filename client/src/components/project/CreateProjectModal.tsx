@@ -4,6 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { createProject } from "../../api/project";
 import { useNavigate } from "react-router-dom";
 import { Project } from "../../types/project";
+import { AxiosResponse } from "axios";
 
 type CreateProjectModalProps = {
   showModal: boolean;
@@ -18,15 +19,18 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
   const [validationMessage, setValidationMessage] = useState<string | null>(
     null
   );
-  const createProjectMutation = useMutation<Project, unknown, Partial<Project>>(
-    {
-      mutationFn: createProject,
-      onSuccess: (project) => {
-        onClose();
-        navigate(`/projects/${project.id}`);
-      },
-    }
-  );
+  const createProjectMutation = useMutation<
+    AxiosResponse<Project>,
+    unknown,
+    Partial<Project>
+  >({
+    mutationFn: createProject,
+    onSuccess: (res) => {
+      const project = res.data;
+      onClose();
+      navigate(`/projects/${project.id}`);
+    },
+  });
   const navigate = useNavigate();
 
   const onSubmit = async () => {

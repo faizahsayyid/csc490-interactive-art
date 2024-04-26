@@ -1,3 +1,5 @@
 export const getHeaders = (): Record<string, string> => {
-  return {};
+  return {
+    Authorization: localStorage.getItem("token") ?? "",
+  };
 };

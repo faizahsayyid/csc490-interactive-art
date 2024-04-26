@@ -107,8 +107,8 @@ class Demo(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": str(e)})
 
 
-# @method_decorator(csrf_exempt, name="dispatch")
 # @method_decorator(login_required, name="dispatch")
+@method_decorator(csrf_exempt, name="dispatch")
 class ProjectListView(View):
     def get(self, request):
         """
@@ -156,8 +156,8 @@ class ProjectListView(View):
             return JsonResponse({"error": str(e)}, status=500)
 
 # EndPoint: /project/<project_id>
-# @method_decorator(csrf_exempt, name="dispatch")
 # @method_decorator(login_required, name="dispatch")
+@method_decorator(csrf_exempt, name="dispatch")
 class ProjectDetailView(View):
     def get(self, request, project_id):
         """
@@ -266,8 +266,8 @@ class ProjectDetailView(View):
         except Project.DoesNotExist:
             return JsonResponse({"error": "Project not found"}, status=404)
 
-# @method_decorator(csrf_exempt, name="dispatch")
 # @method_decorator(login_required, name="dispatch")
+@method_decorator(csrf_exempt, name="dispatch")
 class InputDeviceListView(View):
     def get(self, request, project_id):
         """
@@ -294,8 +294,8 @@ class InputDeviceListView(View):
         except Project.DoesNotExist:
             return JsonResponse({"error": "Project not found"}, status=404)
         
-# @method_decorator(csrf_exempt, name="dispatch")
 # @method_decorator(login_required, name="dispatch")
+@method_decorator(csrf_exempt, name="dispatch")
 class InputDeviceDetailsView(View):
     def get(self, request, project_id, device_id):
         """
@@ -348,8 +348,8 @@ class InputDeviceDetailsView(View):
             return JsonResponse({"error": str(e)}, status=500)
         
     
-# @method_decorator(csrf_exempt, name="dispatch")
 # @method_decorator(login_required, name="dispatch")
+@method_decorator(csrf_exempt, name="dispatch")
 class OutputDeviceListView(View):
     def get(self, request, project_id):
         """
@@ -376,8 +376,8 @@ class OutputDeviceListView(View):
         except Project.DoesNotExist:
             return JsonResponse({"error": "Project not found"}, status=404)
         
-# @method_decorator(csrf_exempt, name="dispatch")
 # @method_decorator(login_required, name="dispatch")
+@method_decorator(csrf_exempt, name="dispatch")
 class OutputDeviceDetailsView(View):
     def get(self, request, project_id, device_id):
         """
@@ -429,8 +429,8 @@ class OutputDeviceDetailsView(View):
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
         
-# @method_decorator(csrf_exempt, name="dispatch")
 # @method_decorator(login_required, name="dispatch")
+@method_decorator(csrf_exempt, name="dispatch")
 class InteractionListView(View):
     def get(self, request, project_id):
         """
@@ -467,8 +467,8 @@ class InteractionListView(View):
         except OutputDevice.DoesNotExist:
             return JsonResponse({"error": "Output device not found"}, status=404)
         
-# @method_decorator(csrf_exempt, name="dispatch")
 # @method_decorator(login_required, name="dispatch")
+@method_decorator(csrf_exempt, name="dispatch")
 class InteractionDetailsView(View):
     def get(self, request, project_id, interaction_id):
         """

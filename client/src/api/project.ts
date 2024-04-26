@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { API_URL } from "./config";
 import { Project } from "../types/project";
 import { getHeaders } from "./getHeaders";
@@ -23,15 +23,12 @@ export const getProjectById = async ({
 
 export const createProject = async ({
   name,
-}: Partial<Project>): Promise<Project> => {
+}: Partial<Project>): Promise<AxiosResponse<Project>> => {
   return axios.post(
     `${API_URL}/arduino/projects/`,
     { name },
     {
-      withCredentials: true,
-      xsrfCookieName: "csrftoken",
-      xsrfHeaderName: "X-CSRFToken",
-      // headers: getHeaders(),
+      headers: getHeaders(),
     }
   );
 };

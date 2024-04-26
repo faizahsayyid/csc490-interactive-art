@@ -49,7 +49,8 @@ class LoginAPI(generics.GenericAPIView):
         if serializer.is_valid(raise_exception=True):
             user = serializer.validated_data
             token, _ = Token.objects.get_or_create(user=user)
-            user = authenticate(username=user.username, password=user.password)
+            password = request.data.get('password')
+            user = authenticate(username=user.username, password=password)
             login(request, user)
             return Response({"user": UserSerializer(user, context=self.get_serializer_context()).data, "token": token.key})
         return Response({"error": "Invalid data"}, status=400)
