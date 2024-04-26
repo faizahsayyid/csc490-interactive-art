@@ -127,8 +127,9 @@ export const Flow: React.FC = () => {
                 name: INPUT_DEVICE_INFO[inputDevice.device_name].name,
                 // @ts-ignore
                 image: INPUT_DEVICE_IMAGES[inputDevice.device_name],
-                // @ts-ignore
-                description: INPUT_DEVICE_INFO[inputDevice.device_name].description,
+                description:
+                  // @ts-ignore
+                  INPUT_DEVICE_INFO[inputDevice.device_name].description,
                 type: "input",
               },
               position: { x: input_x, y: start_y + y_step * index },
@@ -147,8 +148,9 @@ export const Flow: React.FC = () => {
               name: OUTPUT_DEVICE_INFO[outputDevice.device_name].name,
               // @ts-ignore
               image: OUTPUT_DEVICE_IMAGES[outputDevice.device_name],
+              description:
               // @ts-ignore
-              description: OUTPUT_DEVICE_INFO[outputDevice.device_name].description,
+                OUTPUT_DEVICE_INFO[outputDevice.device_name].description,
               type: "output",
             },
             position: { x: output_x, y: start_y + y_step * index },
@@ -156,15 +158,15 @@ export const Flow: React.FC = () => {
         );
 
         setNodes([...initialInputDevices, ...initialOutputDevices]);
-        
+
         // @ts-ignore
-        const initialEdges = project.interactions.map(interaction => ({
-          id: uuidv4(),  
-          source: interaction.input_device,  
+        const initialEdges = project.interactions.map((interaction) => ({
+          id: uuidv4(),
+          source: interaction.input_device,
           target: interaction.output_device,
-          type: 'custom',  
+          type: "custom",
         }));
-    
+
         setEdges(initialEdges);
       })
       .catch((error) => {
@@ -206,14 +208,14 @@ export const Flow: React.FC = () => {
 
   const [lastAddedEdge, setLastAddedEdge] = useState<any | null>(null);
 
-  useEffect(() => {
-    // Delete interactions with no corresponding edge
-    setInteractions((prevInteractions) =>
-      prevInteractions.filter((interaction) =>
-        edges.some((edge) => edge.id === interaction.id)
-      )
-    );
-  }, [edges]);
+  // useEffect(() => {
+  //   // Delete interactions with no corresponding edge
+  //   setInteractions((prevInteractions) =>
+  //     prevInteractions.filter((interaction) =>
+  //       edges.some((edge) => edge.id === interaction.id)
+  //     )
+  //   );
+  // }, [edges]);
 
   useEffect(() => {
     const updateSize = () => {
@@ -371,6 +373,12 @@ export const Flow: React.FC = () => {
     }
     changeSavingState();
 
+    setInteractions((prevInteractions) =>
+      prevInteractions.filter((interaction) =>
+        edges.some((edge) => edge.id === interaction.id)
+      )
+    );
+
     console.log("Putting project to backend:", project);
     axios
       .put(`${API_URL}/arduino/projects/${projectId}/`, project, {
@@ -414,7 +422,7 @@ export const Flow: React.FC = () => {
           </nav>
           <div onClick={saveProject} className="top_button">
             {saving ? "Saved" : "Click to Save Project"}
-            </div>
+          </div>
         </div>
       </div>
 
