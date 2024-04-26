@@ -7,6 +7,10 @@ type ProjectTableProps = {
 };
 
 export const ProjectTable: React.FC<ProjectTableProps> = ({ projects }) => {
+  if (!Array.isArray(projects)) {
+    return <div>No projects available</div>;
+  }
+
   return (
     <table className="table table-hover">
       <thead>

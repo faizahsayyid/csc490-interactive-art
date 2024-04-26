@@ -20,7 +20,7 @@ export const login = async ({ email, password }: User): Promise<void> => {
     alert(data["message"]);
 
   } else {
-    localStorage.setItem("token", data.access);
+    localStorage.setItem("token", data.token);
     window.location.reload();
   }
 };
@@ -51,7 +51,7 @@ export const register = async ({email, password}: User): Promise<void> => {
     }
 
   } else {
-    localStorage.setItem("token", data.access);
+    localStorage.setItem("token", data.token);
     window.location.reload();
   }
 };

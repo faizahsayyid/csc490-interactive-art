@@ -8,14 +8,14 @@ import ReactFlow, {
   useNodesState,
   useEdgesState,
 } from "reactflow";
-import { EXAMPLE_PROJECTS } from "../../constants/example-data";
+// import { EXAMPLE_PROJECTS } from "../../constants/example-data";
 // import { useParams } from "react-router-dom";
 import {
-  INPUT_DEVICE_INFO,
+  // INPUT_DEVICE_INFO,
   INPUT_DEVICE_IMAGES,
 } from "../../constants/device/input-device";
 import {
-  OUTPUT_DEVICE_INFO,
+  // OUTPUT_DEVICE_INFO,
   OUTPUT_DEVICE_IMAGES,
 } from "../../constants/device/output-device";
 import CustomNode from "./CustomNode";
@@ -39,7 +39,7 @@ import {
   OutputNodeToOutputDevice,
 } from "./utils";
 import axios from "axios";
-import { API_URL } from "../../api/config";
+// import { API_URL } from "../../api/config";
 
 // import axios from "axios";
 
@@ -83,7 +83,7 @@ export const Flow: React.FC = () => {
   const fetchProject = async (projectId: string) => {
     try {
       const response = await axios.get(
-        `http://localhost:8000/arduino/projects/${projectId}`,
+        `http://localhost:8000/arduino/projects/${projectId}`
       );
       console.log("Fetched project:", response.data);
       setProject(response.data);
@@ -357,12 +357,14 @@ export const Flow: React.FC = () => {
       >
         <Background />
       </ReactFlow>
-      <button
-        className="btn btn-primary position-fixed bottom-0 end-0 me-4 mb-4 p-3"
-        onClick={toggleDeviceModal}
-      >
-        Add New Device
-      </button>
+      <div className="position-fixed bottom-0 end-0 me-4 mb-4 p-3">
+        <button className="btn btn-primary me-3" onClick={toggleDeviceModal}>
+          Add New Device
+        </button>
+        <Link className="btn btn-primary" to={`/project/${projectId}/review`}>
+          Upload Design To Board
+        </Link>
+      </div>
 
       <DeviceModal
         showModal={showDeviceModal}

@@ -12,11 +12,13 @@ from .models import Project, InputDevice, OutputDevice, Interaction
 from .serializers import ProjectSerializer, InputOutputDeviceInputSerializer, ParamsFromActionSerializer
 from .utils.actions import Actions
 from .serializers import ProjectSerializer, InputDeviceSerializer, OutputDeviceSerializer, InteractionSerializer
+from django.contrib.auth.models import User
+from rest_framework.authtoken.models import Token
 
 PYTHON_TO_TS_ACTION_TYPE_MAP = {"int": "number", "bool": "boolean"}
 
 
-@method_decorator(csrf_exempt, name="dispatch")
+# @method_decorator(csrf_exempt, name="dispatch")
 class SendCodeToBoard(APIView):
     def post(self, request, *args, **kwargs):
         try:
@@ -58,7 +60,7 @@ class SendCodeToBoard(APIView):
         except Exception as e:
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data={"error": str(e)})
 
-@method_decorator(csrf_exempt, name="dispatch")
+# @method_decorator(csrf_exempt, name="dispatch")
 class GetActionsForDevices(APIView):
     def post(self, request, *args, **kwargs):
         serializer = InputOutputDeviceInputSerializer(data=request.data)
@@ -73,7 +75,7 @@ class GetActionsForDevices(APIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@method_decorator(csrf_exempt, name="dispatch")
+# @method_decorator(csrf_exempt, name="dispatch")
 class GetRequiredAdditionalParamsForActions(APIView):
     def post(self, request, *args, **kwargs):
         serializer = ParamsFromActionSerializer(data=request.data)
@@ -93,7 +95,7 @@ class GetRequiredAdditionalParamsForActions(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@method_decorator(csrf_exempt, name="dispatch")
+# @method_decorator(csrf_exempt, name="dispatch")
 class Demo(APIView):
     def post(self, request, *args, **kwargs):
         try:
@@ -105,15 +107,15 @@ class Demo(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": str(e)})
 
 
-@method_decorator(csrf_exempt, name="dispatch")
-@method_decorator(login_required, name="dispatch")
+# @method_decorator(csrf_exempt, name="dispatch")
+# @method_decorator(login_required, name="dispatch")
 class ProjectListView(View):
     def get(self, request):
         """
         Get a list of all projects owned by the user
         """
         try:
-            projects = Project.objects.filter(owner=request.user)
+            projects = Project.objects.filter(owner=User.objects.filter(auth_token=(request.headers.get("Authorization"))).first())
             serializer = ProjectSerializer(projects, many=True)
             return JsonResponse(serializer.data, safe=False)
 
@@ -132,11 +134,11 @@ class ProjectListView(View):
                 return JsonResponse({"error": "Project name is required"}, status=400)
 
             # Check if project with the same name already exists
-            if Project.objects.filter(name=project_name, owner=request.user).exists():
+            if Project.objects.filter(name=project_name, owner=User.objects.filter(auth_token=(request.headers.get("Authorization"))).first()).exists():
                 return JsonResponse({"error": "Project with this name already exists"}, status=400)
 
             # Create new project
-            project = Project.objects.create(owner=request.user, name=project_name)
+            project = Project.objects.create(owner=User.objects.filter(auth_token=(request.headers.get("Authorization"))).first(), name=project_name)
             if "input_devices" in data:
                 input_devices = data.get("input_devices", [])
                 for device in input_devices:
@@ -154,15 +156,15 @@ class ProjectListView(View):
             return JsonResponse({"error": str(e)}, status=500)
 
 # EndPoint: /project/<project_id>
-@method_decorator(csrf_exempt, name="dispatch")
-@method_decorator(login_required, name="dispatch")
+# @method_decorator(csrf_exempt, name="dispatch")
+# @method_decorator(login_required, name="dispatch")
 class ProjectDetailView(View):
     def get(self, request, project_id):
         """
         Get details of a specific project
         """
         try:
-            project = Project.objects.get(id=project_id, owner=request.user)
+            project = Project.objects.get(id=project_id, owner=User.objects.filter(auth_token=(request.headers.get("Authorization"))).first())
             serializer = ProjectSerializer(project)
             return JsonResponse(serializer.data)
         except Project.DoesNotExist:
@@ -173,7 +175,7 @@ class ProjectDetailView(View):
         Delete a project
         """
         try:
-            project = Project.objects.get(id=project_id, owner=request.user)
+            project = Project.objects.get(id=project_id, owner=User.objects.filter(auth_token=(request.headers.get("Authorization"))).first())
             project.delete()
             return JsonResponse({"success": True, "message": "Project deleted successfully"})
         except Project.DoesNotExist:
@@ -186,7 +188,7 @@ class ProjectDetailView(View):
         Update a project
         """
         try:
-            project = Project.objects.get(id=project_id, owner=request.user)
+            project = Project.objects.get(id=project_id, owner=User.objects.filter(auth_token=(request.headers.get("Authorization"))).first())
             data = json.loads(request.body)
 
             # if the user is trying to edit the project name
@@ -264,15 +266,15 @@ class ProjectDetailView(View):
         except Project.DoesNotExist:
             return JsonResponse({"error": "Project not found"}, status=404)
 
-@method_decorator(csrf_exempt, name="dispatch")
-@method_decorator(login_required, name="dispatch")
+# @method_decorator(csrf_exempt, name="dispatch")
+# @method_decorator(login_required, name="dispatch")
 class InputDeviceListView(View):
     def get(self, request, project_id):
         """
         Get a list of all input devices in a project
         """
         try:
-            project = Project.objects.get(id=project_id, owner=request.user)
+            project = Project.objects.get(id=project_id, owner=User.objects.filter(auth_token=(request.headers.get("Authorization"))).first())
             input_devices = project.input_devices.all()
             serializer = InputDeviceSerializer(input_devices, many=True)
             return JsonResponse(serializer.data, safe=False)
@@ -284,7 +286,7 @@ class InputDeviceListView(View):
         Add a new input device to a project
         """
         try:
-            project = Project.objects.get(id=project_id, owner=request.user)
+            project = Project.objects.get(id=project_id, owner=User.objects.filter(auth_token=(request.headers.get("Authorization"))).first())
             data = json.loads(request.body)
             device = InputDevice.objects.create(project=project, **data)
             serializer = InputDeviceSerializer(device)
@@ -292,15 +294,15 @@ class InputDeviceListView(View):
         except Project.DoesNotExist:
             return JsonResponse({"error": "Project not found"}, status=404)
         
-@method_decorator(csrf_exempt, name="dispatch")
-@method_decorator(login_required, name="dispatch")
+# @method_decorator(csrf_exempt, name="dispatch")
+# @method_decorator(login_required, name="dispatch")
 class InputDeviceDetailsView(View):
     def get(self, request, project_id, device_id):
         """
         Get details of a specific input device
         """
         try:
-            project = Project.objects.get(id=project_id, owner=request.user)
+            project = Project.objects.get(id=project_id, owner=User.objects.filter(auth_token=(request.headers.get("Authorization"))).first())
             device = project.input_devices.get(id=device_id)
             serializer = InputDeviceSerializer(device)
             return JsonResponse(serializer.data)
@@ -314,7 +316,7 @@ class InputDeviceDetailsView(View):
         Delete an input device
         """
         try:
-            project = Project.objects.get(id=project_id, owner=request.user)
+            project = Project.objects.get(id=project_id, owner=User.objects.filter(auth_token=(request.headers.get("Authorization"))).first())
             device = project.input_devices.get(id=device_id)
             device.delete()
             return JsonResponse({"success": True, "message": "Input device deleted successfully"})
@@ -330,7 +332,7 @@ class InputDeviceDetailsView(View):
         Update an input device
         """
         try:
-            project = Project.objects.get(id=project_id, owner=request.user)
+            project = Project.objects.get(id=project_id, owner=User.objects.filter(auth_token=(request.headers.get("Authorization"))).first())
             device = project.input_devices.get(id=device_id)
             data = json.loads(request.body)
             serializer = InputDeviceSerializer(device, data=data)
@@ -346,15 +348,15 @@ class InputDeviceDetailsView(View):
             return JsonResponse({"error": str(e)}, status=500)
         
     
-@method_decorator(csrf_exempt, name="dispatch")
-@method_decorator(login_required, name="dispatch")
+# @method_decorator(csrf_exempt, name="dispatch")
+# @method_decorator(login_required, name="dispatch")
 class OutputDeviceListView(View):
     def get(self, request, project_id):
         """
         Get a list of all output devices in a project
         """
         try:
-            project = Project.objects.get(id=project_id, owner=request.user)
+            project = Project.objects.get(id=project_id, owner=User.objects.filter(auth_token=(request.headers.get("Authorization"))).first())
             output_devices = project.output_devices.all()
             serializer = OutputDeviceSerializer(output_devices, many=True)
             return JsonResponse(serializer.data, safe=False)
@@ -366,7 +368,7 @@ class OutputDeviceListView(View):
         Add a new output device to a project
         """
         try:
-            project = Project.objects.get(id=project_id, owner=request.user)
+            project = Project.objects.get(id=project_id, owner=User.objects.filter(auth_token=(request.headers.get("Authorization"))).first())
             data = json.loads(request.body)
             device = OutputDevice.objects.create(project=project, **data)
             serializer = OutputDeviceSerializer(device)
@@ -374,15 +376,15 @@ class OutputDeviceListView(View):
         except Project.DoesNotExist:
             return JsonResponse({"error": "Project not found"}, status=404)
         
-@method_decorator(csrf_exempt, name="dispatch")
-@method_decorator(login_required, name="dispatch")
+# @method_decorator(csrf_exempt, name="dispatch")
+# @method_decorator(login_required, name="dispatch")
 class OutputDeviceDetailsView(View):
     def get(self, request, project_id, device_id):
         """
         Get details of a specific output device
         """
         try:
-            project = Project.objects.get(id=project_id, owner=request.user)
+            project = Project.objects.get(id=project_id, owner=User.objects.filter(auth_token=(request.headers.get("Authorization"))).first())
             device = project.output_devices.get(id=device_id)
             serializer = OutputDeviceSerializer(device)
             return JsonResponse(serializer.data)
@@ -396,7 +398,7 @@ class OutputDeviceDetailsView(View):
         Delete an output device
         """
         try:
-            project = Project.objects.get(id=project_id, owner=request.user)
+            project = Project.objects.get(id=project_id, owner=User.objects.filter(auth_token=(request.headers.get("Authorization"))).first())
             device = project.output_devices.get(id=device_id)
             device.delete()
             return JsonResponse({"success": True, "message": "Output device deleted successfully"})
@@ -412,7 +414,7 @@ class OutputDeviceDetailsView(View):
         Update an output device
         """
         try:
-            project = Project.objects.get(id=project_id, owner=request.user)
+            project = Project.objects.get(id=project_id, owner=User.objects.filter(auth_token=(request.headers.get("Authorization"))).first())
             device = project.output_devices.get(id=device_id)
             data = json.loads(request.body)
             serializer = OutputDeviceSerializer(device, data=data)
@@ -427,15 +429,15 @@ class OutputDeviceDetailsView(View):
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
         
-@method_decorator(csrf_exempt, name="dispatch")
-@method_decorator(login_required, name="dispatch")
+# @method_decorator(csrf_exempt, name="dispatch")
+# @method_decorator(login_required, name="dispatch")
 class InteractionListView(View):
     def get(self, request, project_id):
         """
         Get a list of all interactions in a project
         """
         try:
-            project = Project.objects.get(id=project_id, owner=request.user)
+            project = Project.objects.get(id=project_id, owner=User.objects.filter(auth_token=(request.headers.get("Authorization"))).first())
             interactions = project.interactions.all()
             serializer = InteractionSerializer(interactions, many=True)
             return JsonResponse(serializer.data, safe=False)
@@ -450,7 +452,7 @@ class InteractionListView(View):
             data = json.loads(request.body)
             if "project" in data:
                 data.pop("project")
-            project = Project.objects.get(id=project_id, owner=request.user)
+            project = Project.objects.get(id=project_id, owner=User.objects.filter(auth_token=(request.headers.get("Authorization"))).first())
             input_device_id = data.pop("input_device")
             output_device_id = data.pop("output_device")
             input_device = InputDevice.objects.get(id=input_device_id)
@@ -465,15 +467,15 @@ class InteractionListView(View):
         except OutputDevice.DoesNotExist:
             return JsonResponse({"error": "Output device not found"}, status=404)
         
-@method_decorator(csrf_exempt, name="dispatch")
-@method_decorator(login_required, name="dispatch")
+# @method_decorator(csrf_exempt, name="dispatch")
+# @method_decorator(login_required, name="dispatch")
 class InteractionDetailsView(View):
     def get(self, request, project_id, interaction_id):
         """
         Get details of a specific interaction
         """
         try:
-            project = Project.objects.get(id=project_id, owner=request.user)
+            project = Project.objects.get(id=project_id, owner=User.objects.filter(auth_token=(request.headers.get("Authorization"))).first())
             interaction = project.interactions.get(id=interaction_id)
             serializer = InteractionSerializer(interaction)
             return JsonResponse(serializer.data)
@@ -487,7 +489,7 @@ class InteractionDetailsView(View):
         Delete an interaction
         """
         try:
-            project = Project.objects.get(id=project_id, owner=request.user)
+            project = Project.objects.get(id=project_id, owner=User.objects.filter(auth_token=(request.headers.get("Authorization"))).first())
             interaction = project.interactions.get(id=interaction_id)
             interaction.delete()
             return JsonResponse({"success": True, "message": "Interaction deleted successfully"})
@@ -503,7 +505,7 @@ class InteractionDetailsView(View):
         Update an interaction
         """
         try:
-            project = Project.objects.get(id=project_id, owner=request.user)
+            project = Project.objects.get(id=project_id, owner=User.objects.filter(auth_token=(request.headers.get("Authorization"))).first())
             interaction = project.interactions.get(id=interaction_id)
             data = json.loads(request.body)
             input_device_id = data.get("input_device")
