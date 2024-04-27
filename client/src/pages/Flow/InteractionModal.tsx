@@ -3,7 +3,13 @@ import React, { useEffect, useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import axios from "axios";
 import { ActionVariable, ActionVariableType } from "../../types/action";
-import { ACTION_TO_DESCRIPTION, ACTION_TO_NAME, INTERACTION_COLOR_MAP, ARGS_TO_DESCRIPTION } from "./Constants";
+import {
+  ACTION_TO_DESCRIPTION,
+  ACTION_TO_NAME,
+  INTERACTION_COLOR_MAP,
+  ARGS_TO_DESCRIPTION,
+} from "./Constants";
+import { API_URL } from "../../api/config";
 
 interface InteractionModalProps {
   showModal: boolean;
@@ -32,7 +38,11 @@ const InteractionModal: React.FC<InteractionModalProps> = ({
     return null;
   }
   const [allowedActions, setAllowedActions] = useState<string[]>([]);
-  const [selectedAction, setSelectedAction] = useState<ActionVariable>({name: "[select]", type: "boolean", description: ""});
+  const [selectedAction, setSelectedAction] = useState<ActionVariable>({
+    name: "[select]",
+    type: "boolean",
+    description: "",
+  });
   const [actionParameters, setActionParameters] = useState<ActionVariable[]>(
     []
   );
@@ -41,7 +51,7 @@ const InteractionModal: React.FC<InteractionModalProps> = ({
   );
 
   useEffect(() => {
-    setSelectedAction({name: "[select]", type: "boolean", description: ""});
+    setSelectedAction({ name: "[select]", type: "boolean", description: "" });
     setActionParameters([]);
     setParameterValues({});
   }, [showModal]);
@@ -54,7 +64,7 @@ const InteractionModal: React.FC<InteractionModalProps> = ({
       };
 
       axios
-        .post("http://127.0.0.1:8000/arduino/actions/", requestBody)
+        .post(`${API_URL}/arduino/actions/`, requestBody)
         .then((response) => {
           console.log("Response actions:", response.data);
           setAllowedActions(response.data);
@@ -72,7 +82,7 @@ const InteractionModal: React.FC<InteractionModalProps> = ({
       };
 
       axios
-        .post("http://127.0.0.1:8000/arduino/action-params/", requestBody)
+        .post(`${API_URL}/arduino/action-params/`, requestBody)
         .then((response) => {
           console.log("Response:", response.data);
           let ActionVariables: ActionVariable[] = [];
@@ -104,7 +114,13 @@ const InteractionModal: React.FC<InteractionModalProps> = ({
     if (selectedAction.name !== "[select]") {
       console.log("Args:", parameterValues);
       if (id) {
-        onConfirm(id, sourceDevice, targetDevice, selectedAction, parameterValues);
+        onConfirm(
+          id,
+          sourceDevice,
+          targetDevice,
+          selectedAction,
+          parameterValues
+        );
       } else {
         alert("Error: Interaction ID not provided.");
       }
@@ -134,11 +150,18 @@ const InteractionModal: React.FC<InteractionModalProps> = ({
                 <option value="[select]">[select]</option>
                 {allowedActions.map((action, index) => (
                   // @ts-ignore
-                  <option key={index} value={action}>{ACTION_TO_NAME[action]}</option>
+                  <option key={index} value={action}>
+                    {ACTION_TO_NAME[action]}
+                  </option>
                 ))}
               </Form.Control>
               {/* @ts-ignore */}
-              <span style={{color: `${INTERACTION_COLOR_MAP[selectedAction]}`}}>{selectedAction.name !== "[select]" && ACTION_TO_DESCRIPTION[selectedAction]}</span>
+              <span
+                style={{ color: `${INTERACTION_COLOR_MAP[selectedAction]}` }}
+              >
+                {selectedAction.name !== "[select]" &&
+                  ACTION_TO_DESCRIPTION[selectedAction]}
+              </span>
             </Form.Group>
           )}
           {selectedAction.name !== "[select]" &&
