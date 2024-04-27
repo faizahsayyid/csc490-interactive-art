@@ -3,21 +3,17 @@ import React from "react";
 export const Help: React.FC = () => {
   return (
     <div className="d-flex flex-column gap-3">
-      <h2 className="h3">Quick Start Guide</h2>
-      <div
-        className="my-3"
-        style={{
-          backgroundColor: "lightgray",
-          color: "black",
-          width: "50%",
-          margin: "auto",
-          height: "300px",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        TODO: Put Demo Video Here
+      <h2 className="h3">Demo</h2>
+      <div className="d-flex justify-content-center">
+        <iframe
+          width="560"
+          height="315"
+          src="https://www.youtube.com/embed/k9N-vT8DSAg?si=pgrOOeqvR1sd89fa"
+          title="YouTube video player"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerPolicy="strict-origin-when-cross-origin"
+          allowFullScreen
+        ></iframe>
       </div>
       <h2 className="h3">Required Installations</h2>
       <h3 className="h5 fw-bold">Arduino CLI</h3>
